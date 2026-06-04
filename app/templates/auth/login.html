@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Sign In — COP Agona Ahanta{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="{{ url_for('static', filename='images/logo.png') }}"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
+           alt="COP Agona Ahanta" />
+      <h1 style="display:none">COP Agona Ahanta</h1>
+    </div>
+    <p class="auth-subtitle">Church of Pentecost — Agona Ahanta</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash flash--{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form class="auth-form" method="POST" action="{{ url_for('auth.login') }}" novalidate>
+      <div class="form-group">
+        <input type="text" name="identifier" class="form-input"
+               placeholder="Username or email" autocomplete="username"
+               required autofocus />
+      </div>
+      <div class="form-group">
+        <input type="password" name="password" class="form-input"
+               placeholder="Password" autocomplete="current-password"
+               required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Log In</button>
+    </form>
+
+    <div class="auth-divider"><span>OR</span></div>
+
+    <p class="auth-switch">
+      Don't have an account?
+      <a href="{{ url_for('auth.signup') }}">Sign up</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

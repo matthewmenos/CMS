@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Admin — COP Agona Ahanta{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+</head>
+<body class="admin-body">
+
+<aside class="admin-sidebar">
+  <div class="sidebar-brand">
+    <img src="{{ url_for('static', filename='images/logo.png') }}"
+         onerror="this.src=''" alt="COP" class="sidebar-logo" />
+    <span>Admin Panel</span>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if request.endpoint=='admin.dashboard' %}active{% endif %}">Dashboard</a>
+    <a href="{{ url_for('admin.members') }}"  class="sidebar-link {% if request.endpoint=='admin.members'  %}active{% endif %}">Members</a>
+    <a href="{{ url_for('admin.posts') }}"    class="sidebar-link {% if request.endpoint=='admin.posts'    %}active{% endif %}">Posts</a>
+    <a href="{{ url_for('admin.giving') }}"   class="sidebar-link {% if request.endpoint=='admin.giving'   %}active{% endif %}">Giving</a>
+    <a href="{{ url_for('admin.events') }}"   class="sidebar-link {% if request.endpoint=='admin.events'   %}active{% endif %}">Events</a>
+    <a href="{{ url_for('auth.logout') }}"    class="sidebar-link sidebar-link--danger">Sign Out</a>
+  </nav>
+</aside>
+
+<main class="admin-main">
+  <div class="admin-topbar">
+    <h1 class="admin-page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+    <span class="admin-church-name">{{ church_name }}</span>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="flash flash--{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

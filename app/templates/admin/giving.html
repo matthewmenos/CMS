@@ -1,0 +1,30 @@
+{% extends "admin/base_admin.html" %}
+{% block page_title %}Giving Records{% endblock %}
+
+{% block content %}
+<table class="admin-table">
+  <thead>
+    <tr><th>ID</th><th>Member</th><th>Amount</th><th>Category</th><th>Reference</th><th>Status</th><th>Date</th><th>Action</th></tr>
+  </thead>
+  <tbody>
+    {% for r in records %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.display_name or '—' }}</td>
+      <td>{{ r.currency }} {{ "%.2f"|format(r.amount) }}</td>
+      <td>{{ r.category }}</td>
+      <td><code>{{ r.reference }}</code></td>
+      <td><span class="badge-status badge-status--{{ r.status }}">{{ r.status }}</span></td>
+      <td>{{ r.created_at[:10] }}</td>
+      <td>
+        {% if r.status == 'pending' %}
+        <form method="POST" action="{{ url_for('admin.confirm_giving', record_id=r.id) }}">
+          <button class="btn btn-sm btn-success">Confirm</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

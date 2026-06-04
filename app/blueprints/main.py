@@ -1,0 +1,38 @@
+"""
+Main blueprint — serves the single-page shell for all UI routes.
+"""
+
+from flask import Blueprint, render_template
+from flask_login import login_required
+
+main_bp = Blueprint("main", __name__)
+
+
+@main_bp.route("/")
+@login_required
+def index():
+    return render_template("index.html")
+
+
+@main_bp.route("/explore")
+@login_required
+def explore():
+    return render_template("index.html")
+
+
+@main_bp.route("/reels")
+@login_required
+def reels():
+    return render_template("index.html")
+
+
+@main_bp.route("/give")
+@login_required
+def give():
+    return render_template("index.html")
+
+
+@main_bp.route("/profile")
+@login_required
+def profile():
+    return render_template("index.html")

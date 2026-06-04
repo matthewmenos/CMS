@@ -1,0 +1,3 @@
+Place your church logo here as: logo.png (512x512 recommended)
+Place default avatar as: default-avatar.png (256x256 recommended)
+Place PWA icons as: ../icons/icon-192.png and ../icons/icon-512.png

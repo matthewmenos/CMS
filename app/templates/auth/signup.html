@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — COP Agona Ahanta{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="{{ url_for('static', filename='images/logo.png') }}"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
+           alt="COP Agona Ahanta" />
+      <h1 style="display:none">COP Agona Ahanta</h1>
+    </div>
+    <p class="auth-subtitle">Join COP Agona Ahanta</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash flash--{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form class="auth-form" method="POST" action="{{ url_for('auth.signup') }}" novalidate>
+      <div class="form-group">
+        <input type="text" name="username" class="form-input"
+               placeholder="Username" autocomplete="username"
+               required autofocus pattern="[a-zA-Z0-9._]{3,30}" />
+      </div>
+      <div class="form-group">
+        <input type="email" name="email" class="form-input"
+               placeholder="Email address" autocomplete="email"
+               required />
+      </div>
+      <div class="form-group">
+        <input type="password" name="password" class="form-input"
+               placeholder="Password (min 8 chars)" autocomplete="new-password"
+               required minlength="8" />
+      </div>
+      <div class="form-group">
+        <input type="password" name="confirm" class="form-input"
+               placeholder="Confirm password" autocomplete="new-password"
+               required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+    </form>
+
+    <p class="auth-switch">
+      Already have an account?
+      <a href="{{ url_for('auth.login') }}">Log in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,144 @@
+/* Admin panel supplemental styles */
+
+.admin-body {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--color-bg-card);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  padding: var(--sp-lg) var(--sp-md);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-primary);
+  border-bottom: 1px solid var(--color-border);
+}
+.sidebar-logo { height: 28px; width: auto; }
+
+.sidebar-nav { display: flex; flex-direction: column; padding: var(--sp-sm) 0; }
+
+.sidebar-link {
+  padding: var(--sp-sm) var(--sp-md);
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: background var(--transition), border-color var(--transition);
+  text-decoration: none;
+}
+.sidebar-link:hover { background: var(--color-bg-input); text-decoration: none; }
+.sidebar-link.active { border-left-color: var(--color-primary); color: var(--color-primary); background: var(--blue-100); }
+[data-theme="dark"] .sidebar-link.active { background: rgba(66,165,245,.12); }
+.sidebar-link--danger { color: var(--color-danger); margin-top: auto; }
+
+/* Main area */
+.admin-main { flex: 1; overflow-y: auto; padding: var(--sp-lg); }
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-lg);
+}
+
+.admin-page-title { font-size: 22px; font-weight: 700; }
+.admin-church-name { font-size: 13px; color: var(--color-text-muted); }
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--sp-md);
+  margin-bottom: var(--sp-xl);
+}
+
+.stat-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-lg);
+}
+.stat-card--accent { border-color: var(--color-accent); background: var(--yellow-100); }
+[data-theme="dark"] .stat-card--accent { background: #1a1500; }
+
+.stat-value { font-size: 28px; font-weight: 800; color: var(--color-primary); }
+.stat-label { font-size: 12px; color: var(--color-text-muted); margin-top: 4px; }
+
+/* Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+.admin-table th,
+.admin-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--color-border); }
+.admin-table th  { font-weight: 600; background: var(--color-bg-input); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table tr:hover td { background: var(--color-bg-input); }
+.empty-row { text-align: center; color: var(--color-text-muted); padding: var(--sp-lg) !important; }
+
+.section-title { font-size: 16px; font-weight: 700; margin: var(--sp-lg) 0 var(--sp-md); }
+
+/* Badge status */
+.badge-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-status--active    { background: #d1fae5; color: #065f46; }
+.badge-status--inactive,
+.badge-status--suspended { background: #fde8ea; color: #b91c1c; }
+.badge-status--pending   { background: var(--yellow-100); color: #78350f; }
+.badge-status--confirmed { background: #d1fae5; color: #065f46; }
+.badge-status--failed    { background: #fde8ea; color: #b91c1c; }
+
+/* Role select */
+.role-select { padding: 2px 6px; font-size: 12px; border-radius: var(--radius-sm); }
+
+/* Collapsible form */
+.collapsible-form {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-md);
+  margin-bottom: var(--sp-lg);
+}
+.collapsible-form summary { cursor: pointer; font-weight: 600; color: var(--color-primary); }
+
+.event-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  margin-top: var(--sp-md);
+}
+.event-form .form-input { width: 100%; padding: var(--sp-sm); }
+.event-form label { font-size: 12px; color: var(--color-text-muted); display: flex; flex-direction: column; gap: 4px; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .admin-sidebar { display: none; }
+  .admin-body { flex-direction: column; }
+}

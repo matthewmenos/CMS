@@ -1,0 +1,35 @@
+{% extends "admin/base_admin.html" %}
+{% block page_title %}Events{% endblock %}
+
+{% block content %}
+<details class="collapsible-form">
+  <summary>+ Create New Event</summary>
+  <form method="POST" action="{{ url_for('admin.create_event') }}" class="event-form">
+    <input type="text"     name="title"       placeholder="Event title"    required class="form-input" />
+    <textarea              name="description" placeholder="Description"    rows="3"  class="form-input"></textarea>
+    <input type="text"     name="location"    placeholder="Location"                class="form-input" />
+    <label>Start date/time
+      <input type="datetime-local" name="starts_at" required class="form-input" />
+    </label>
+    <label>End date/time (optional)
+      <input type="datetime-local" name="ends_at" class="form-input" />
+    </label>
+    <button class="btn btn-primary">Create Event</button>
+  </form>
+</details>
+
+<table class="admin-table">
+  <thead><tr><th>ID</th><th>Title</th><th>Location</th><th>Starts</th><th>Ends</th></tr></thead>
+  <tbody>
+    {% for e in events %}
+    <tr>
+      <td>{{ e.id }}</td>
+      <td>{{ e.title }}</td>
+      <td>{{ e.location or '—' }}</td>
+      <td>{{ e.starts_at[:16].replace('T',' ') }}</td>
+      <td>{{ e.ends_at[:16].replace('T',' ') if e.ends_at else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

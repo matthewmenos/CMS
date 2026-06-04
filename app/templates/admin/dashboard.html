@@ -1,0 +1,50 @@
+{% extends "admin/base_admin.html" %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.global_users }}</div>
+    <div class="stat-label">Total Users</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.posts }}</div>
+    <div class="stat-label">Posts</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.stories }}</div>
+    <div class="stat-label">Stories</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.comments }}</div>
+    <div class="stat-label">Comments</div>
+  </div>
+  <div class="stat-card stat-card--accent">
+    <div class="stat-value">GHS {{ "%.2f"|format(stats.giving_total) }}</div>
+    <div class="stat-label">Total Giving (Confirmed)</div>
+  </div>
+</div>
+
+<h2 class="section-title">Recent Posts</h2>
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>#</th><th>Author</th><th>Caption</th><th>Likes</th><th>Comments</th><th>Posted</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in recent_posts %}
+    <tr>
+      <td>{{ p.id }}</td>
+      <td>{{ p.display_name }}</td>
+      <td>{{ p.caption[:60] }}{% if p.caption|length > 60 %}…{% endif %}</td>
+      <td>{{ p.like_count }}</td>
+      <td>{{ p.comment_count }}</td>
+      <td>{{ p.created_at[:10] }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="empty-row">No posts yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

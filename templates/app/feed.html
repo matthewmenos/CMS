@@ -5,9 +5,22 @@
 {% endblock %}
 
 {% block body %}
+
+<!-- Auth guard runs synchronously BEFORE anything else renders -->
+<script>
+  (function() {
+    var token = localStorage.getItem('access_token');
+    if (!token) {
+      window.location.replace('/auth/login');
+      // Stop further rendering
+      document.documentElement.style.display = 'none';
+    }
+  })();
+</script>
+
 <div class="app-shell" id="appShell">
 
-  <!-- ── TOP HEADER ─────────────────────────────────────────────────────── -->
+  <!-- ── TOP HEADER ───────────────────────────────────────────────────────── -->
   <header class="app-header" id="appHeader">
     <div class="header-left">
       <img src="/static/icons/logo.png" alt="Logo" class="header-logo"
@@ -16,11 +29,13 @@
     </div>
     <div class="header-actions">
       <button class="icon-btn" id="themeToggleBtn" aria-label="Toggle theme">
-        <svg class="icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
         </svg>
       </button>
@@ -34,13 +49,12 @@
     </div>
   </header>
 
-  <!-- ── MAIN SCROLL AREA ───────────────────────────────────────────────── -->
+  <!-- ── MAIN SCROLL AREA ─────────────────────────────────────────────────── -->
   <main class="app-main" id="appMain">
 
     <!-- Stories bar -->
     <section class="stories-bar" id="storiesBar" aria-label="Stories">
       <div class="stories-track" id="storiesTrack">
-        <!-- Devotional story always first -->
         <div class="story-item story-devotional" id="devotionalStory">
           <div class="story-ring">
             <div class="story-avatar-wrap">
@@ -50,7 +64,6 @@
           </div>
           <span class="story-label">Devotional</span>
         </div>
-        <!-- Dynamic stories injected by JS -->
       </div>
     </section>
 
@@ -61,45 +74,41 @@
         <div class="skeleton-post"></div>
         <div class="skeleton-post"></div>
       </div>
-      <!-- Posts injected by JS -->
     </section>
 
-    <!-- Load more sentinel for infinite scroll -->
     <div id="loadMoreSentinel" class="load-sentinel"></div>
   </main>
 
-  <!-- ── BOTTOM NAV ─────────────────────────────────────────────────────── -->
+  <!-- ── BOTTOM NAV ───────────────────────────────────────────────────────── -->
   <nav class="bottom-nav" aria-label="Main navigation">
-    <a href="/feed" class="nav-item active" data-page="feed" aria-label="Home">
+    <a href="/feed" class="nav-item active" aria-label="Home">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
         <polyline points="9 22 9 12 15 12 15 22"/>
       </svg>
       <span>Home</span>
     </a>
-    <a href="/search" class="nav-item" data-page="search" aria-label="Search">
+    <a href="/search" class="nav-item" aria-label="Search">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
       <span>Search</span>
     </a>
-    <a href="/reels" class="nav-item" data-page="reels" aria-label="Reels">
+    <a href="/reels" class="nav-item" aria-label="Reels">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
         <line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/>
-        <line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/>
-        <line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/>
-        <line x1="17" y1="7" x2="22" y2="7"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
       </svg>
       <span>Reels</span>
     </a>
-    <a href="/give" class="nav-item" data-page="give" aria-label="Give">
+    <a href="/give" class="nav-item" aria-label="Give">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
       </svg>
       <span>Give</span>
     </a>
-    <a href="/profile" class="nav-item" data-page="profile" aria-label="Profile">
+    <a href="/profile" class="nav-item" aria-label="Profile">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
         <circle cx="12" cy="7" r="4"/>
@@ -108,7 +117,7 @@
     </a>
   </nav>
 
-  <!-- ── STORY MODAL ────────────────────────────────────────────────────── -->
+  <!-- ── STORY MODAL ──────────────────────────────────────────────────────── -->
   <div class="story-modal" id="storyModal" hidden role="dialog" aria-modal="true">
     <div class="story-modal-bg" id="storyModalBg"></div>
     <div class="story-modal-content">
@@ -126,7 +135,7 @@
     </div>
   </div>
 
-  <!-- ── COMMENT DRAWER ─────────────────────────────────────────────────── -->
+  <!-- ── COMMENT DRAWER ───────────────────────────────────────────────────── -->
   <div class="comment-drawer" id="commentDrawer" hidden role="dialog" aria-modal="true">
     <div class="drawer-overlay" id="drawerOverlay"></div>
     <div class="drawer-panel">
@@ -138,7 +147,8 @@
         <input type="text" class="ci-input" id="ciInput" placeholder="Add a comment..." />
         <button class="ci-send" id="ciSend" aria-label="Post comment">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
         </button>
       </div>
@@ -147,16 +157,25 @@
 
 </div><!-- /app-shell -->
 
-<!-- Data attributes for JS -->
+<!-- APP_CONFIG set synchronously so JS modules can read it immediately -->
 <script>
+  // Restore display (hidden by auth guard above)
+  document.documentElement.style.display = '';
+
   window.APP_CONFIG = {
     churchSlug: "{{ church_slug }}",
     churchName: "{{ church_name }}",
     token: localStorage.getItem('access_token'),
-    user:  JSON.parse(localStorage.getItem('user') || 'null'),
+    user:  (function() {
+      try { return JSON.parse(localStorage.getItem('user') || 'null'); }
+      catch(e) { return null; }
+    })(),
   };
-  if (!window.APP_CONFIG.token) window.location.href = '/auth/login';
 </script>
-<script src="/static/js/app.js" defer></script>
-<script src="/static/js/stories.js" defer></script>
-<script src="/static/js/feed.js" defer></script>
+
+<!-- Load scripts — NOT deferred so they have APP_CONFIG immediately -->
+<script src="/static/js/app.js"></script>
+<script src="/static/js/stories.js"></script>
+<script src="/static/js/feed.js"></script>
+
+{% endblock %}

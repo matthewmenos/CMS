@@ -1,37 +1,44 @@
 {% extends "base.html" %}
 {% block title %}Sign In — COP Agona Ahanta{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="/static/css/auth.css" />{% endblock %}
+
 {% block body %}
+
+<!-- If already logged in, go straight to feed -->
+<script>
+  if (localStorage.getItem('access_token')) {
+    window.location.replace('/feed');
+  }
+</script>
+
 <div class="auth-root">
   <div class="auth-card">
     <div class="auth-brand">
-      <img src="/static/icons/logo.png" alt="COP Agona Ahanta" class="auth-logo" onerror="this.style.display='none'" />
+      <img src="/static/icons/logo.png" alt="COP Agona Ahanta" class="auth-logo"
+           onerror="this.style.display='none'" />
       <h1 class="auth-church-name">COP Agona Ahanta</h1>
       <p class="auth-tagline">A Place of Grace, Growth &amp; Glory</p>
     </div>
 
-    {% if error %}
-    <div class="auth-error" role="alert">{{ error }}</div>
-    {% endif %}
+    <div class="auth-error" id="authError" role="alert" style="display:none"></div>
 
     <form class="auth-form" id="loginForm" novalidate>
       <div class="form-field">
         <input type="email" id="email" name="email" class="form-input"
                placeholder="Email address" autocomplete="email" required />
-        <span class="field-error" id="emailErr"></span>
       </div>
       <div class="form-field">
         <div class="password-wrap">
           <input type="password" id="password" name="password" class="form-input"
                  placeholder="Password" autocomplete="current-password" required />
           <button type="button" class="toggle-pw" aria-label="Show password">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
               <circle cx="12" cy="12" r="3"/>
             </svg>
           </button>
         </div>
-        <span class="field-error" id="pwErr"></span>
       </div>
       <button type="submit" class="btn-primary btn-full" id="loginBtn">
         <span class="btn-text">Log In</span>
@@ -40,7 +47,6 @@
     </form>
 
     <div class="auth-divider"><span>OR</span></div>
-
     <p class="auth-switch">
       Don't have an account? <a href="/auth/signup">Sign up</a>
     </p>
@@ -48,61 +54,71 @@
 </div>
 
 <script>
-(function() {
-  const form  = document.getElementById('loginForm');
-  const btn   = document.getElementById('loginBtn');
-  const btnTx = btn.querySelector('.btn-text');
-  const btnSp = btn.querySelector('.btn-spinner');
+(function () {
+  'use strict';
+
+  var form   = document.getElementById('loginForm');
+  var btn    = document.getElementById('loginBtn');
+  var errBox = document.getElementById('authError');
 
   // Toggle password visibility
-  document.querySelector('.toggle-pw').addEventListener('click', function() {
-    const pw = document.getElementById('password');
+  document.querySelector('.toggle-pw').addEventListener('click', function () {
+    var pw = document.getElementById('password');
     pw.type = pw.type === 'password' ? 'text' : 'password';
   });
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    const email    = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    hideError();
+
+    var email    = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+
+    if (!email || !password) {
+      showError('Please enter your email and password.');
+      return;
+    }
 
     // Loading state
     btn.disabled = true;
-    btnTx.hidden = true;
-    btnSp.hidden = false;
+    btn.querySelector('.btn-text').hidden = true;
+    btn.querySelector('.btn-spinner').hidden = false;
 
     try {
-      const res = await fetch('/auth/login', {
-        method: 'POST',
+      var res  = await fetch('/auth/login', {
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body:    JSON.stringify({ email: email, password: password }),
       });
-      const data = await res.json();
 
-      if (res.ok) {
+      var data = await res.json();
+
+      if (res.ok && data.access_token) {
+        // Persist credentials
         localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        window.location.href = '/feed';
+        localStorage.setItem('user', JSON.stringify(data.user || {}));
+        // Replace history entry so Back doesn't return to login
+        window.location.replace('/feed');
       } else {
         showError(data.error || 'Login failed. Please try again.');
       }
-    } catch {
-      showError('Network error. Please check your connection.');
+
+    } catch (err) {
+      showError('Network error. Please check your connection and try again.');
     } finally {
       btn.disabled = false;
-      btnTx.hidden = false;
-      btnSp.hidden = true;
+      btn.querySelector('.btn-text').hidden = false;
+      btn.querySelector('.btn-spinner').hidden = true;
     }
   });
 
   function showError(msg) {
-    let el = document.querySelector('.auth-error');
-    if (!el) {
-      el = document.createElement('div');
-      el.className = 'auth-error';
-      form.before(el);
-    }
-    el.textContent = msg;
-    el.setAttribute('role', 'alert');
+    errBox.textContent = msg;
+    errBox.style.display = 'block';
+  }
+  function hideError() {
+    errBox.style.display = 'none';
+    errBox.textContent = '';
   }
 })();
 </script>

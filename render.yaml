@@ -1,0 +1,79 @@
+# render.yaml — One-click Render deployment config for COP Agona Ahanta ChMS
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: cop-agona-ahanta
+    runtime: python
+    region: oregon   # Change to: frankfurt | singapore | ohio as needed
+
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn 'app:create_app()' --workers 2 --threads 2 --bind 0.0.0.0:$PORT --timeout 120 --worker-class sync --access-logfile - --error-logfile -"
+
+    # Health check — Render pings this to confirm the app is alive
+    healthCheckPath: /health
+
+    envVars:
+      # ── App ────────────────────────────────────────────────────────────────
+      - key: FLASK_ENV
+        value: production
+
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+      # Auto-generated strong secrets — Render fills these in
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: JWT_SECRET_KEY
+        generateValue: true
+
+      # ── SQLite paths (use /tmp — writable on Render) ───────────────────────
+      - key: DATABASE_URL
+        value: sqlite:////tmp/global.db
+
+      - key: TENANT_DB_DIR
+        value: /tmp/tenants
+
+      # ── Church identity ────────────────────────────────────────────────────
+      - key: CHURCH_NAME
+        value: COP Agona Ahanta
+
+      - key: CHURCH_SLUG
+        value: cop-agona-ahanta
+
+      - key: CHURCH_TAGLINE
+        value: A Place of Grace, Growth & Glory
+
+      # ── Admin (set these as SECRETS in Render dashboard, not here) ─────────
+      - key: ADMIN_EMAIL
+        sync: false   # Render will prompt you to enter this manually
+
+      - key: ADMIN_PASSWORD
+        sync: false   # Render will prompt you to enter this manually
+
+      - key: ADMIN_NAME
+        value: Church Admin
+
+      # ── Cloudflare R2 (set as SECRETS in Render dashboard) ────────────────
+      - key: R2_ACCOUNT_ID
+        sync: false
+
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+
+      - key: R2_ENDPOINT_URL
+        sync: false   # https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+
+      - key: R2_MEDIA_BUCKET
+        value: cop-agona-media
+
+      - key: R2_DB_BUCKET
+        value: cop-agona-databases
+
+      # ── Cache ──────────────────────────────────────────────────────────────
+      - key: CACHE_TYPE
+        value: SimpleCache

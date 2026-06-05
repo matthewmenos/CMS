@@ -2,60 +2,53 @@
 {% block title %}COP Agona Ahanta{% endblock %}
 
 {% block body %}
-<!-- ============================================================
-     APP SHELL  (Single-Page Application shell)
-     All screens are rendered by JavaScript inside #app-root.
-     ============================================================ -->
 <div id="app-root">
 
-  <!-- ── HEADER ── -->
+  <!-- ══ HEADER ══════════════════════════════════════════════════════════════ -->
   <header class="app-header" id="app-header">
     <div class="header-inner">
-      <a href="/" class="header-logo" aria-label="Home">
+
+      <a href="/" class="header-brand" aria-label="Home">
         <img src="{{ url_for('static', filename='images/logo.png') }}"
-             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
-             alt="COP Agona Ahanta" class="logo-img" />
-        <span class="logo-text" style="display:none">COP Agona Ahanta</span>
+             onerror="this.style.display='none';this.nextSibling.style.display='flex'"
+             alt="" class="header-logo-img" />
+        <span class="header-logo-text" style="display:none">COP Agona Ahanta</span>
+        <span class="header-church-name">COP Agona Ahanta</span>
       </a>
 
       <div class="header-actions">
-        <button class="icon-btn" id="btn-theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
-          <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <!-- Theme toggle -->
+        <button class="hdr-btn" id="btn-theme-toggle" aria-label="Toggle theme" data-theme="light">
+          <svg class="hdr-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
             <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
             <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
           </svg>
-          <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+          <svg class="hdr-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
 
-        <button class="icon-btn" id="btn-notifications" aria-label="Notifications">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- Notifications -->
+        <button class="hdr-btn hdr-btn--notif" id="btn-notifications" aria-label="Notifications">
+          <svg class="hdr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
-          <span class="badge" id="notif-badge" hidden>0</span>
-        </button>
-
-        <button class="icon-btn" aria-label="Direct messages">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
+          <span class="hdr-badge" id="notif-badge" hidden>0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- ── MAIN CONTENT AREA ── -->
+  <!-- ══ MAIN ════════════════════════════════════════════════════════════════ -->
   <main class="app-main" id="app-main">
 
-    <!-- STORIES BAR -->
-    <section class="stories-bar" id="stories-bar" aria-label="Stories">
+    <!-- Stories bar -->
+    <section class="stories-section" id="stories-bar" aria-label="Stories">
       <div class="stories-scroll" id="stories-scroll">
-        <!-- Populated by JS -->
-        <div class="story-skeleton"></div>
         <div class="story-skeleton"></div>
         <div class="story-skeleton"></div>
         <div class="story-skeleton"></div>
@@ -63,31 +56,26 @@
       </div>
     </section>
 
-    <!-- FEED -->
-    <section class="feed" id="feed" aria-label="Post feed">
-      <!-- Populated by JS -->
-      <div class="post-skeleton-card"></div>
-      <div class="post-skeleton-card"></div>
+    <!-- Feed -->
+    <section id="feed" aria-label="Posts feed">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
     </section>
 
-    <!-- EXPLORE GRID -->
-    <section class="explore-grid" id="explore-grid" hidden></section>
+    <!-- Other views (hidden until nav click) -->
+    <section id="explore-grid"  hidden aria-label="Explore"></section>
+    <section id="reels-view"    hidden aria-label="Sermon videos"></section>
+    <section id="give-view"     hidden aria-label="Give"></section>
+    <section id="profile-view"  hidden aria-label="Profile"></section>
 
-    <!-- REELS -->
-    <section class="reels-view" id="reels-view" hidden></section>
+    <!-- Notifications panel (dropdown) -->
+    <div class="notif-panel" id="notif-panel" hidden role="dialog" aria-label="Notifications"></div>
 
-    <!-- GIVE -->
-    <section class="give-view" id="give-view" hidden></section>
-
-    <!-- PROFILE -->
-    <section class="profile-view" id="profile-view" hidden></section>
-
-    <!-- NOTIFICATIONS PANEL -->
-    <aside class="notif-panel" id="notif-panel" hidden aria-label="Notifications"></aside>
   </main>
 
-  <!-- ── BOTTOM NAVIGATION ── -->
+  <!-- ══ BOTTOM NAV ══════════════════════════════════════════════════════════ -->
   <nav class="bottom-nav" id="bottom-nav" aria-label="Main navigation">
+
     <button class="nav-btn active" data-view="feed" aria-label="Home">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -103,119 +91,151 @@
       <span>Explore</span>
     </button>
 
-    <button class="nav-btn nav-btn--post" id="btn-new-post" aria-label="New Post">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <rect x="3" y="3" width="18" height="18" rx="3"/>
-        <line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
-      </svg>
-      <span>Post</span>
+    <!-- New post FAB -->
+    <button class="nav-btn nav-fab" id="btn-new-post" aria-label="New post">
+      <span class="fab-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </span>
     </button>
 
-    <button class="nav-btn" data-view="reels" aria-label="Sermons / Reels">
+    <button class="nav-btn" data-view="reels" aria-label="Sermons">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+        <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
       </svg>
       <span>Sermons</span>
     </button>
 
-    <button class="nav-btn" data-view="give" aria-label="Give / Tithe">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-      </svg>
-      <span>Give</span>
-    </button>
-
-    <button class="nav-btn" data-view="profile" aria-label="My Profile">
+    <button class="nav-btn" data-view="profile" aria-label="Profile">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
         <circle cx="12" cy="7" r="4"/>
       </svg>
       <span>Profile</span>
     </button>
-  </nav>
 
+  </nav>
 </div><!-- /#app-root -->
 
-<!-- ── MODALS ── -->
 
-<!-- New Post Modal -->
-<div class="modal-overlay" id="modal-new-post" hidden aria-modal="true" role="dialog">
-  <div class="modal">
+<!-- ══ MODAL: New Post ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-new-post" hidden role="dialog" aria-modal="true" aria-label="New post">
+  <div class="modal modal--sheet">
+    <div class="modal-drag-handle"></div>
     <div class="modal-header">
-      <button class="modal-close" aria-label="Close">&times;</button>
-      <h2>New Post</h2>
+      <button class="modal-close-btn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <h2 class="modal-title">New Post</h2>
       <button class="btn btn-primary btn-sm" id="btn-submit-post">Share</button>
     </div>
+
     <div class="modal-body">
-      <div class="upload-drop-zone" id="post-drop-zone">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="upload-icon">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-        <p>Tap to select a photo or video</p>
+      <!-- Drop zone -->
+      <div class="drop-zone" id="post-drop-zone">
+        <div class="drop-zone-inner">
+          <div class="drop-zone-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40">
+              <rect x="3" y="3" width="18" height="18" rx="3"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </div>
+          <p class="drop-zone-text">Drag &amp; drop or tap to select</p>
+          <p class="drop-zone-hint">Photos and videos up to 500 MB</p>
+          <button class="btn btn-outline btn-sm" type="button">Browse files</button>
+        </div>
         <input type="file" id="post-file-input" accept="image/*,video/*" hidden />
       </div>
+
+      <!-- Preview -->
       <div class="upload-preview" id="post-preview" hidden>
         <img id="post-preview-img" alt="Preview" />
         <video id="post-preview-vid" controls hidden></video>
-        <button class="btn btn-ghost btn-sm" id="btn-change-media">Change</button>
+        <button class="btn btn-ghost btn-sm" id="btn-change-media" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Change
+        </button>
       </div>
+
+      <!-- Upload progress -->
       <div class="upload-progress" id="upload-progress" hidden>
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-        <span id="progress-label">Uploading…</span>
+        <div class="upload-progress-ring">
+          <svg viewBox="0 0 44 44" width="64" height="64">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="var(--border)" stroke-width="3"/>
+            <circle cx="22" cy="22" r="18" fill="none" stroke="var(--primary)" stroke-width="3"
+                    stroke-dasharray="113" stroke-dashoffset="113" id="progress-ring-fill"
+                    stroke-linecap="round" transform="rotate(-90 22 22)"/>
+          </svg>
+          <span class="upload-pct" id="upload-pct">0%</span>
+        </div>
+        <p id="progress-label">Uploading…</p>
       </div>
-      <div class="post-form" id="post-form" hidden>
-        <textarea id="post-caption" placeholder="Write a caption…" rows="3" maxlength="2200"></textarea>
-        <input type="text" id="post-location" placeholder="Add location" maxlength="100" />
-        <select id="post-type">
-          <option value="image">Photo</option>
-          <option value="video">Video</option>
-          <option value="reel">Short Sermon</option>
+
+      <!-- Caption & meta form -->
+      <div class="post-meta-form" id="post-form" hidden>
+        <textarea id="post-caption" class="form-input caption-input"
+                  placeholder="Write a caption… share what's on your heart" rows="3" maxlength="2200"></textarea>
+        <input type="text" id="post-location" class="form-input"
+               placeholder="📍 Add location" maxlength="100" />
+        <select id="post-type" class="form-input">
+          <option value="image">📷 Photo</option>
+          <option value="video">🎥 Video</option>
+          <option value="reel">🎬 Short Sermon</option>
         </select>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Story Viewer Modal -->
-<div class="modal-overlay story-overlay" id="modal-story" hidden aria-modal="true" role="dialog">
+<!-- ══ MODAL: Story Viewer ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay story-overlay" id="modal-story" hidden role="dialog" aria-modal="true">
   <div class="story-viewer">
-    <div class="story-progress-bar" id="story-progress-bar"></div>
-    <div class="story-header">
-      <img class="story-avatar-lg" id="sv-avatar" src="" alt="" />
-      <span class="story-username" id="sv-username"></span>
-      <span class="story-time" id="sv-time"></span>
-      <button class="story-close" id="btn-story-close">&times;</button>
+    <div class="story-prog-bar" id="story-progress-bar"></div>
+    <div class="story-top-bar">
+      <img class="story-av" id="sv-avatar" src="" alt="" />
+      <span class="story-uname" id="sv-username"></span>
+      <time class="story-ts" id="sv-time"></time>
+      <button class="story-x" id="btn-story-close" aria-label="Close story">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
     </div>
-    <div class="story-media-container">
+    <div class="story-media">
       <img id="sv-image" src="" alt="" />
-      <video id="sv-video" autoplay muted loop hidden></video>
+      <video id="sv-video" autoplay loop hidden></video>
     </div>
-    <div class="story-caption" id="sv-caption"></div>
-    <button class="story-nav story-nav--prev" id="sv-prev">&#8249;</button>
-    <button class="story-nav story-nav--next" id="sv-next">&#8250;</button>
+    <div class="story-cap" id="sv-caption"></div>
+    <button class="story-nav story-nav--l" id="sv-prev" aria-label="Previous story">&#8249;</button>
+    <button class="story-nav story-nav--r" id="sv-next" aria-label="Next story">&#8250;</button>
   </div>
 </div>
 
-<!-- Comments Modal -->
-<div class="modal-overlay" id="modal-comments" hidden aria-modal="true" role="dialog">
-  <div class="modal modal--bottom">
+<!-- ══ MODAL: Comments ═══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-comments" hidden role="dialog" aria-modal="true" aria-label="Comments">
+  <div class="modal modal--sheet modal--comments">
+    <div class="modal-drag-handle"></div>
     <div class="modal-header">
-      <button class="modal-close" aria-label="Close">&times;</button>
-      <h2>Comments</h2>
+      <button class="modal-close-btn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <h2 class="modal-title">Comments</h2>
     </div>
     <div class="comments-list" id="comments-list"></div>
     <div class="comment-input-bar">
-      <img class="comment-avatar-sm" id="comment-my-avatar" src="" alt="You" />
-      <input type="text" id="comment-input" placeholder="Add a comment…" maxlength="1000" />
+      <img class="comment-av" id="comment-my-avatar" src="/static/images/default-avatar.svg" alt="You" />
+      <input type="text" id="comment-input" class="form-input"
+             placeholder="Add a comment…" maxlength="1000" />
       <button class="btn btn-primary btn-sm" id="btn-post-comment">Post</button>
     </div>
   </div>
 </div>
 
-<!-- Toast notification -->
-<div class="toast" id="toast" aria-live="polite"></div>
+<!-- ══ TOAST ════════════════════════════════════════════════════════════════ -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<!-- Main JS -->
+<!-- ══ JS ══════════════════════════════════════════════════════════════════ -->
 <script src="{{ url_for('static', filename='js/app.js') }}" type="module"></script>
 {% endblock %}

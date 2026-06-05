@@ -34,10 +34,7 @@ def create_app() -> Flask:
             "pool_pre_ping": True,
             "connect_args": {"check_same_thread": False},
         },
-        TENANT_DB_DIR=os.path.join(
-            app.instance_path,
-            os.environ.get("TENANT_DB_DIR", "tenants"),
-        ),
+        TENANT_DB_DIR=os.path.join(app.instance_path, "tenants"),
         CHURCH_SLUG=os.environ.get("CHURCH_SLUG", "cop-agona-ahanta"),
         CHURCH_NAME=os.environ.get("CHURCH_NAME", "COP Agona Ahanta"),
         MAX_CONTENT_LENGTH=16 * 1024 * 1024,   # 16 MB hard cap on form uploads

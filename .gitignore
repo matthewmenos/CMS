@@ -1,0 +1,64 @@
+# ── Secrets ───────────────────────────────────────────────────────────────────
+.env
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+pip-wheel-metadata/
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# ── SQLite databases (runtime data — never commit) ────────────────────────────
+instance/global.db
+global.db
+instance/global.db-shm
+instance/global.db-wal
+instance/tenants/
+# Keep the tenants directory itself in git (via .gitkeep)
+!instance/tenants/.gitkeep
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── OS artefacts ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editors ───────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Coverage / test output ────────────────────────────────────────────────────
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Distribution / packaging ───────────────────────────────────────────────────
+*.whl
+*.tar.gz
+MANIFEST
+
+# ── Flask / Werkzeug ──────────────────────────────────────────────────────────
+instance/
+!instance/.gitkeep
+!instance/tenants/.gitkeep

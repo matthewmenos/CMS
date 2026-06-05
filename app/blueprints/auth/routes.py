@@ -189,29 +189,22 @@ def logout():
 
 
 # ---------------------------------------------------------------------------
-# Current user info (for SPA boot)
+# Current user info (for SPA boot) — global DB only, no tenant DB dependency
 # ---------------------------------------------------------------------------
 
 @auth_bp.route("/me")
 @login_required
 def me():
-    from app.utils.tenant import open_tenant_db, get_db, get_or_create_member
     slug = current_app.config["CHURCH_SLUG"]
-    open_tenant_db(slug)
-    member = get_or_create_member(get_db(), current_user.id, current_user.username)
-    from app.utils.r2 import public_media_url
+    # Return lightweight info from global DB only; tenant profile loaded lazily by the SPA
     return _json_ok({
         "user": {
             "id": current_user.id,
             "username": current_user.username,
             "email": current_user.email,
             "role": current_user.role,
-            "display_name": member["display_name"],
-            "bio": member["bio"],
-            "avatar_url": public_media_url(member["avatar_key"]) if member["avatar_key"] else "",
-            "follower_count": member["follower_count"],
-            "following_count": member["following_count"],
-            "post_count": member["post_count"],
+            "display_name": current_user.username,
+            "avatar_url": "",
             "church_slug": slug,
             "church_name": current_app.config["CHURCH_NAME"],
         }

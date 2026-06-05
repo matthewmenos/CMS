@@ -1,8 +1,8 @@
 /* Service Worker — COP Agona Ahanta PWA
    Strategy: Cache-first for static assets, network-first for API calls. */
 
-const CACHE_NAME   = "cop-ah-v1";
-const STATIC_CACHE = "cop-ah-static-v1";
+const CACHE_NAME   = "cop-ah-v2";
+const STATIC_CACHE = "cop-ah-static-v2";
 
 const PRECACHE = [
   "/",
@@ -10,6 +10,7 @@ const PRECACHE = [
   "/static/js/app.js",
   "/static/manifest.json",
   "/static/images/logo.png",
+  "/static/images/default-avatar.svg",
   "/static/icons/icon-192.png",
 ];
 

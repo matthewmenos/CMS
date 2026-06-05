@@ -1,51 +1,189 @@
 {% extends "base.html" %}
-{% block title %}Sign Up — COP Agona Ahanta{% endblock %}
+{% block title %}Create Account — COP Agona Ahanta{% endblock %}
 
 {% block body %}
 <div class="auth-page">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <img src="{{ url_for('static', filename='images/logo.png') }}"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
-           alt="COP Agona Ahanta" />
-      <h1 style="display:none">COP Agona Ahanta</h1>
+
+  <div class="auth-blob auth-blob--1"></div>
+  <div class="auth-blob auth-blob--2"></div>
+
+  <div class="auth-split">
+
+    <!-- Left branding panel -->
+    <div class="auth-brand-panel">
+      <div class="auth-brand-inner">
+        <div class="auth-church-badge">
+          <img src="{{ url_for('static', filename='images/logo.png') }}"
+               onerror="this.style.display='none'"
+               alt="COP Agona Ahanta logo" class="auth-logo-img" />
+        </div>
+        <h1 class="auth-brand-name">COP Agona Ahanta</h1>
+        <p class="auth-brand-tagline">Church of Pentecost</p>
+        <p class="auth-brand-desc">
+          Join our growing church community. Share in worship, fellowship,
+          and the work of God's Kingdom together.
+        </p>
+      </div>
     </div>
-    <p class="auth-subtitle">Join COP Agona Ahanta</p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for cat, msg in messages %}
-        <div class="flash flash--{{ cat }}">{{ msg }}</div>
-      {% endfor %}
-    {% endwith %}
+    <!-- Right form panel -->
+    <div class="auth-form-panel">
+      <div class="auth-card">
 
-    <form class="auth-form" method="POST" action="{{ url_for('auth.signup') }}" novalidate>
-      <div class="form-group">
-        <input type="text" name="username" class="form-input"
-               placeholder="Username" autocomplete="username"
-               required autofocus pattern="[a-zA-Z0-9._]{3,30}" />
-      </div>
-      <div class="form-group">
-        <input type="email" name="email" class="form-input"
-               placeholder="Email address" autocomplete="email"
-               required />
-      </div>
-      <div class="form-group">
-        <input type="password" name="password" class="form-input"
-               placeholder="Password (min 8 chars)" autocomplete="new-password"
-               required minlength="8" />
-      </div>
-      <div class="form-group">
-        <input type="password" name="confirm" class="form-input"
-               placeholder="Confirm password" autocomplete="new-password"
-               required />
-      </div>
-      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
-    </form>
+        <div class="auth-mobile-logo">
+          <img src="{{ url_for('static', filename='images/logo.png') }}"
+               onerror="this.style.display='none'"
+               alt="COP Agona Ahanta" />
+          <span>COP Agona Ahanta</span>
+        </div>
 
-    <p class="auth-switch">
-      Already have an account?
-      <a href="{{ url_for('auth.login') }}">Log in</a>
-    </p>
+        <h2 class="auth-card-title">Create your account</h2>
+        <p class="auth-card-sub">Join the COP Agona Ahanta community</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for cat, msg in messages %}
+            <div class="flash flash--{{ cat }}">
+              <span class="flash-icon">{{ '✕' if cat=='error' else '✓' }}</span>
+              {{ msg }}
+            </div>
+          {% endfor %}
+        {% endwith %}
+
+        <form class="auth-form" method="POST" action="{{ url_for('auth.signup') }}" novalidate id="signup-form">
+
+          <div class="field">
+            <label class="field-label" for="username">Username</label>
+            <div class="field-input-wrap">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+              <input type="text" id="username" name="username" class="form-input"
+                     placeholder="e.g. kofi_mensah" autocomplete="username"
+                     required autofocus pattern="[a-zA-Z0-9._]{3,30}" />
+            </div>
+            <span class="field-hint">3–30 characters, letters, numbers, . and _</span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="email">Email address</label>
+            <div class="field-input-wrap">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input type="email" id="email" name="email" class="form-input"
+                     placeholder="you@example.com" autocomplete="email"
+                     required />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="password">Password</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input type="password" id="password" name="password" class="form-input"
+                       placeholder="Min. 8 characters" autocomplete="new-password"
+                       required minlength="8" />
+                <button type="button" class="field-eye" id="toggle-pw" tabindex="-1" aria-label="Show password">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="confirm">Confirm password</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 11 12 14 22 4"/>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                <input type="password" id="confirm" name="confirm" class="form-input"
+                       placeholder="Repeat password" autocomplete="new-password"
+                       required />
+              </div>
+            </div>
+          </div>
+
+          <!-- Password strength bar -->
+          <div class="pw-strength" id="pw-strength" hidden>
+            <div class="pw-strength-bar">
+              <div class="pw-strength-fill" id="pw-fill"></div>
+            </div>
+            <span class="pw-strength-label" id="pw-label"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full" id="btn-signup">
+            <span class="btn-text">Create Account</span>
+            <span class="btn-spinner" hidden></span>
+          </button>
+
+          <p class="auth-terms">
+            By creating an account you agree to our church community guidelines.
+          </p>
+        </form>
+
+        <div class="auth-divider"><span>or</span></div>
+
+        <p class="auth-switch">
+          Already have an account?
+          <a href="{{ url_for('auth.login') }}" class="auth-link">Sign in</a>
+        </p>
+      </div>
+    </div>
   </div>
 </div>
+
+<script>
+  // Password eye toggle
+  document.getElementById("toggle-pw").addEventListener("click", function () {
+    const pw = document.getElementById("password");
+    pw.type = pw.type === "password" ? "text" : "password";
+  });
+
+  // Password strength indicator
+  const pwInput = document.getElementById("password");
+  const pwBar   = document.getElementById("pw-strength");
+  const pwFill  = document.getElementById("pw-fill");
+  const pwLabel = document.getElementById("pw-label");
+
+  pwInput.addEventListener("input", function () {
+    const val = this.value;
+    if (!val.length) { pwBar.hidden = true; return; }
+    pwBar.hidden = false;
+
+    let score = 0;
+    if (val.length >= 8)  score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+      { label: "Weak",   color: "#ED4956", width: "25%" },
+      { label: "Fair",   color: "#FFC107", width: "50%" },
+      { label: "Good",   color: "#42A5F5", width: "75%" },
+      { label: "Strong", color: "#2D8A4E", width: "100%" },
+    ];
+    const level = levels[score - 1] || levels[0];
+    pwFill.style.width      = level.width;
+    pwFill.style.background = level.color;
+    pwLabel.textContent     = level.label;
+    pwLabel.style.color     = level.color;
+  });
+
+  // Loading state on submit
+  document.getElementById("signup-form").addEventListener("submit", function () {
+    const pw  = document.getElementById("password").value;
+    const cfm = document.getElementById("confirm").value;
+    if (pw !== cfm) { alert("Passwords do not match."); return false; }
+    const btn = document.getElementById("btn-signup");
+    btn.disabled = true;
+    btn.querySelector(".btn-text").hidden = true;
+    btn.querySelector(".btn-spinner").hidden = false;
+  });
+</script>
 {% endblock %}

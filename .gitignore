@@ -18,17 +18,20 @@ pip-wheel-metadata/
 venv/
 .venv/
 env/
-.env/
 ENV/
 
-# ── SQLite databases (runtime data — never commit) ────────────────────────────
+# ── SQLite databases ──────────────────────────────────────────────────────────
+*.db
+*.db-shm
+*.db-wal
+
+# ── Instance folder: ignore runtime files, track directory placeholders ───────
 instance/global.db
-global.db
 instance/global.db-shm
 instance/global.db-wal
-instance/tenants/
-# Keep the tenants directory itself in git (via .gitkeep)
-!instance/tenants/.gitkeep
+instance/tenants/*.db
+instance/tenants/*.db-shm
+instance/tenants/*.db-wal
 
 # ── Logs ──────────────────────────────────────────────────────────────────────
 *.log
@@ -53,12 +56,7 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
-# ── Distribution / packaging ───────────────────────────────────────────────────
+# ── Distribution ──────────────────────────────────────────────────────────────
 *.whl
 *.tar.gz
 MANIFEST
-
-# ── Flask / Werkzeug ──────────────────────────────────────────────────────────
-instance/
-!instance/.gitkeep
-!instance/tenants/.gitkeep

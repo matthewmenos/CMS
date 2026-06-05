@@ -12,16 +12,17 @@ When R2 credentials are absent or the connection fails the module degrades
 gracefully — local SQLite files are used instead.
 """
 
-import os
-import threading
+import atexit
 import logging
+import os
 import warnings
+from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from typing import Optional
 
 import boto3
 from botocore.config import Config
-from botocore.exceptions import ClientError, EndpointResolutionError, BotoCoreError
+from botocore.exceptions import BotoCoreError, ClientError, EndpointResolutionError
 
 # Suppress the utcnow() DeprecationWarning that comes from botocore internals.
 # This is a third-party library issue, not our code.
@@ -33,6 +34,12 @@ warnings.filterwarnings(
 )
 
 log = logging.getLogger(__name__)
+
+# Bounded thread pool for async DB syncs.
+# max_workers=2 is plenty — syncs are rare and sequential per tenant.
+# wait=False at shutdown so the interpreter doesn't block on pending syncs.
+_sync_pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="r2-sync")
+atexit.register(lambda: _sync_pool.shutdown(wait=False, cancel_futures=True))
 
 
 def _r2_configured() -> bool:
@@ -135,14 +142,22 @@ def upload_tenant_db(db_key: str, local_path: str) -> None:
 
 
 def upload_tenant_db_async(db_key: str, local_path: str) -> None:
-    """Fire-and-forget DB sync — response is never blocked."""
+    """
+    Submit a DB sync to the background thread pool.
+    Safe to call at any point — the pool's atexit handler cancels pending
+    futures cleanly so the interpreter never blocks or errors on shutdown.
+    """
     def _run():
         try:
             upload_tenant_db(db_key, local_path)
-        except Exception:
-            log.exception("Background DB sync failed for %s", db_key)
+        except Exception as exc:
+            log.warning("Background DB sync failed for %s: %s", db_key, exc)
 
-    threading.Thread(target=_run, daemon=True).start()
+    try:
+        _sync_pool.submit(_run)
+    except RuntimeError:
+        # Pool already shut down (interpreter exiting) — skip silently.
+        pass
 
 
 # ---------------------------------------------------------------------------

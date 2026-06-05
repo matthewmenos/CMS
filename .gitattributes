@@ -1,0 +1,13 @@
+# Normalise all text files to LF in the repo, checkout as-is on Windows
+* text=auto eol=lf
+
+# Force binary for these (no line-ending conversion)
+*.db    binary
+*.db-shm binary
+*.db-wal binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.svg   text eol=lf

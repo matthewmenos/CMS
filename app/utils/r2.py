@@ -95,13 +95,31 @@ def download_tenant_db(db_key: str, local_path: str) -> bool:
 
     os.makedirs(os.path.dirname(local_path), exist_ok=True)
     try:
+        # Download to a temp file first to check if it's valid
+        temp_path = local_path + ".tmp"
         _s3_client().download_file(
             Bucket=os.environ["R2_BUCKET_DB"],
             Key=db_key,
-            Filename=local_path,
+            Filename=temp_path,
         )
-        log.info("Downloaded tenant DB  %s → %s", db_key, local_path)
-        return True
+        
+        # Check if the downloaded DB has any data
+        import sqlite3
+        test_conn = sqlite3.connect(temp_path)
+        test_conn.row_factory = sqlite3.Row
+        result = test_conn.execute("SELECT COUNT(*) as cnt FROM members").fetchone()
+        test_conn.close()
+        
+        # Only use the downloaded DB if it has data
+        if result["cnt"] > 0:
+            os.replace(temp_path, local_path)
+            log.info("Downloaded tenant DB  %s → %s", db_key, local_path)
+            return True
+        else:
+            # Downloaded DB is empty, don't use it
+            os.remove(temp_path)
+            log.info("Downloaded tenant DB is empty, keeping local init for %s", db_key)
+            return False
 
     except ClientError as exc:
         code = exc.response["Error"]["Code"]

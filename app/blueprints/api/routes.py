@@ -707,6 +707,156 @@ def delete_all_device_tokens():
 
 
 # ---------------------------------------------------------------------------
+# PROFILE EDITING
+# ---------------------------------------------------------------------------
+
+@api_bp.put("/profile")
+@login_required
+@require_tenant
+def update_profile():
+    """Update the current user's profile (display name, bio, avatar)."""
+    conn   = get_db()
+    member = _current_member(conn)
+    body   = request.get_json(silent=True) or {}
+    
+    display_name = (body.get("display_name") or "").strip()[:80]
+    bio          = (body.get("bio") or "").strip()[:500]
+    avatar_key   = (body.get("avatar_key") or "").strip()[:255]
+    
+    if not display_name:
+        return _err("Display name is required.")
+    
+    conn.execute(
+        """UPDATE members 
+           SET display_name = ?, bio = ?, avatar_key = ?
+           WHERE id = ?""",
+        (display_name, bio, avatar_key, member["id"]),
+    )
+    conn.commit()
+    mark_dirty()
+    
+    return _ok({"display_name": display_name, "bio": bio, "avatar_url": public_media_url(avatar_key) if avatar_key else ""})
+
+
+# ---------------------------------------------------------------------------
+# POST REPORTING
+# ---------------------------------------------------------------------------
+
+@api_bp.post("/posts/<int:post_id>/report")
+@login_required
+@require_tenant
+def report_post(post_id: int):
+    """Report a post for moderation review."""
+    conn   = get_db()
+    member = _current_member(conn)
+    
+    # Check post exists
+    post = conn.execute("SELECT id FROM posts WHERE id=? AND is_deleted=0", (post_id,)).fetchone()
+    if not post:
+        return _err("Post not found.", 404)
+    
+    # Check if already reported
+    existing = conn.execute(
+        "SELECT id FROM notifications WHERE recipient_id=? AND actor_id=? AND type='report' AND post_id=?",
+        (member["id"], member["id"], post_id),
+    ).fetchone()
+    
+    if not existing:
+        conn.execute(
+            """INSERT INTO notifications (recipient_id, actor_id, type, post_id)
+               VALUES (?, ?, 'report', ?)""",
+            (member["id"], member["id"], post_id),
+        )
+        conn.commit()
+        mark_dirty()
+    
+    return _ok({"reported": True})
+
+
+# ---------------------------------------------------------------------------
+# PRAYER REQUESTS
+# ---------------------------------------------------------------------------
+
+@api_bp.get("/prayer-requests")
+@login_required
+@require_tenant
+def get_prayer_requests():
+    """Get public prayer requests and user's own requests."""
+    conn   = get_db()
+    member = _current_member(conn)
+    
+    rows = conn.execute(
+        """SELECT p.*, m.display_name, m.avatar_key
+           FROM prayer_requests p
+           JOIN members m ON m.id = p.member_id
+           WHERE p.is_public = 1 OR p.member_id = ?
+           ORDER BY p.created_at DESC LIMIT 50""",
+        (member["id"],),
+    ).fetchall()
+    
+    requests = []
+    for r in rows:
+        r = dict(r)
+        r["avatar_url"] = public_media_url(r["avatar_key"]) if r["avatar_key"] else ""
+        requests.append(r)
+    
+    return _ok(requests)
+
+
+@api_bp.post("/prayer-requests")
+@login_required
+@require_tenant
+def create_prayer_request():
+    """Create a new prayer request."""
+    conn   = get_db()
+    member = _current_member(conn)
+    body   = request.get_json(silent=True) or {}
+    
+    title     = (body.get("title") or "").strip()[:100]
+    body_text = (body.get("body") or "").strip()[:1000]
+    is_public = 1 if body.get("is_public", True) else 0
+    
+    if not title:
+        return _err("Title is required.")
+    
+    cur = conn.execute(
+        """INSERT INTO prayer_requests (member_id, title, body, is_public)
+           VALUES (?, ?, ?, ?)""",
+        (member["id"], title, body_text, is_public),
+    )
+    conn.commit()
+    mark_dirty()
+    
+    return _ok({"id": cur.lastrowid, "title": title, "is_public": is_public}, status=201)
+
+
+# ---------------------------------------------------------------------------
+# BIBLE VERSE
+# ---------------------------------------------------------------------------
+
+@api_bp.get("/bible/verse")
+def get_bible_verse():
+    """Get a daily Bible verse (static for now, can be replaced with API)."""
+    verses = [
+        {"reference": "John 3:16", "text": "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."},
+        {"reference": "Jeremiah 29:11", "text": "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future."},
+        {"reference": "Philippians 4:13", "text": "I can do all this through him who gives me strength."},
+        {"reference": "Psalm 23:1", "text": "The Lord is my shepherd, I lack nothing."},
+        {"reference": "Romans 8:28", "text": "And we know that in all things God works for the good of those who love him, who have been called according to his purpose."},
+        {"reference": "Proverbs 3:5-6", "text": "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight."},
+        {"reference": "Matthew 11:28", "text": "Come to me, all you who are weary and burdened, and I will give you rest."},
+        {"reference": "Isaiah 40:31", "text": "But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint."},
+    ]
+    
+    # Return a verse based on the day of year
+    from datetime import datetime
+    day_of_year = datetime.now().timetuple().tm_yday
+    verse = verses[day_of_year % len(verses)]
+    
+    return _ok(verse)
+
+
+# ---------------------------------------------------------------------------
 # SEARCH
 # ---------------------------------------------------------------------------
 

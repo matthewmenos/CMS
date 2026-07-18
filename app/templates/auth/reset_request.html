@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Reset Password — COP Agona Ahanta{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+  <div class="auth-blob auth-blob--1"></div>
+  <div class="auth-blob auth-blob--2"></div>
+
+  <div class="auth-split">
+    <div class="auth-brand-panel">
+      <div class="auth-brand-inner">
+        <div class="auth-church-badge">
+          <img src="{{ url_for('static', filename='images/logo.png') }}"
+               onerror="this.style.display='none'"
+               alt="COP Agona Ahanta logo" class="auth-logo-img" />
+        </div>
+        <h1 class="auth-brand-name">COP Agona Ahanta</h1>
+        <p class="auth-brand-tagline">Church of Pentecost</p>
+      </div>
+    </div>
+
+    <div class="auth-form-panel">
+      <div class="auth-card">
+        <div class="auth-mobile-logo">
+          <img src="{{ url_for('static', filename='images/logo.png') }}"
+               onerror="this.style.display='none'"
+               alt="COP Agona Ahanta" />
+          <span>COP Agona Ahanta</span>
+        </div>
+
+        <h2 class="auth-card-title">Reset your password</h2>
+        <p class="auth-card-sub">Enter your email to receive a reset link</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for cat, msg in messages %}
+            <div class="flash flash--{{ cat }}">
+              <span class="flash-icon">{{ '✕' if cat=='error' else '✓' }}</span>
+              {{ msg }}
+            </div>
+          {% endfor %}
+        {% endwith %}
+
+        <form class="auth-form" method="POST" action="{{ url_for('auth.reset_password_request') }}" novalidate id="reset-form">
+          <div class="field">
+            <label class="field-label" for="email">Email address</label>
+            <div class="field-input-wrap">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input type="email" id="email" name="email" class="form-input"
+                     placeholder="you@example.com" autocomplete="email"
+                     required autofocus />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full" id="btn-reset">
+            <span class="btn-text">Send Reset Link</span>
+            <span class="btn-spinner" hidden></span>
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          <a href="{{ url_for('auth.login') }}" class="auth-link">Back to Sign In</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.addEventListener("pageshow", function() {
+    const btn = document.getElementById("btn-reset");
+    if (btn) {
+      btn.disabled = false;
+      btn.querySelector(".btn-text").hidden = false;
+      btn.querySelector(".btn-spinner").hidden = true;
+    }
+  });
+</script>
+{% endblock %}

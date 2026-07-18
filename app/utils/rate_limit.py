@@ -56,7 +56,7 @@ def rate_limit(max_requests: int = 10, window_seconds: int = 60):
 
 
 # Predefined rate limit decorators for common use cases
-login_rate_limit = rate_limit(max_requests=5, window_seconds=60)
-api_rate_limit = rate_limit(max_requests=60, window_seconds=60)
-upload_rate_limit = rate_limit(max_requests=10, window_seconds=60)
-giving_rate_limit = rate_limit(max_requests=5, window_seconds=60)
+login_rate_limit = rate_limit(max_requests=20, window_seconds=60)  # More reasonable for login attempts
+api_rate_limit = rate_limit(max_requests=120, window_seconds=60)
+upload_rate_limit = rate_limit(max_requests=20, window_seconds=60)
+giving_rate_limit = rate_limit(max_requests=10, window_seconds=60)

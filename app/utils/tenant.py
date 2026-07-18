@@ -16,6 +16,7 @@ reuses the existing connection (no leak).
 import os
 import time
 import logging
+import sqlite3
 from functools import wraps
 
 from flask import g, abort, current_app, has_request_context

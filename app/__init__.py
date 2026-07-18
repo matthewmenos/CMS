@@ -46,6 +46,11 @@ def create_app() -> Flask:
 
     os.makedirs(app.instance_path, exist_ok=True)
     os.makedirs(app.config["TENANT_DB_DIR"], exist_ok=True)
+    
+    # Ensure the database directory exists before any DB operations
+    db_dir = os.path.dirname(os.path.join(app.instance_path, "global.db"))
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
 
     # ------------------------------------------------------------------
     # Extensions

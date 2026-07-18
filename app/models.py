@@ -214,6 +214,18 @@ CREATE TABLE IF NOT EXISTS device_tokens (
     UNIQUE(member_id, fcm_token)
 );
 
+-- Prayer requests
+CREATE TABLE IF NOT EXISTS prayer_requests (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id  INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    title      TEXT    NOT NULL,
+    body       TEXT    DEFAULT '',
+    is_public  INTEGER DEFAULT 1,
+    is_answered INTEGER DEFAULT 0,
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    answered_at TEXT,
+);
+
 -- Performance indexes
 CREATE INDEX IF NOT EXISTS idx_rsvps_event ON event_rsvps(event_id, status);
 CREATE INDEX IF NOT EXISTS idx_posts_member   ON posts(member_id, created_at DESC);
@@ -224,6 +236,7 @@ CREATE INDEX IF NOT EXISTS idx_notif_recipient ON notifications(recipient_id, is
 CREATE INDEX IF NOT EXISTS idx_stories_member  ON stories(member_id, expires_at DESC);
 CREATE INDEX IF NOT EXISTS idx_audit_user     ON admin_audit(user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_device_tokens_member ON device_tokens(member_id);
+CREATE INDEX IF NOT EXISTS idx_prayer_requests_member ON prayer_requests(member_id);
 """
 
 

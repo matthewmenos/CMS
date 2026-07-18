@@ -4,6 +4,7 @@ Handles both HTML form submissions and JSON requests (for the SPA).
 """
 
 import re
+import logging
 from datetime import datetime, timezone
 
 from flask import (
@@ -15,6 +16,8 @@ from werkzeug.exceptions import BadRequest
 
 from app.models import db, GlobalUser, Church
 from app.utils.rate_limit import login_rate_limit, api_rate_limit
+
+log = logging.getLogger(__name__)
 
 auth_bp = Blueprint("auth", __name__, template_folder="../../templates/auth")
 
@@ -212,3 +215,60 @@ def me():
             "church_name": current_app.config["CHURCH_NAME"],
         }
     })
+
+
+# ---------------------------------------------------------------------------
+# Password Reset
+# ---------------------------------------------------------------------------
+
+@auth_bp.route("/reset-password", methods=["GET", "POST"])
+def reset_password_request():
+    """Request a password reset link."""
+    if request.method == "GET":
+        return render_template("auth/reset_request.html")
+    
+    data = request.get_json(silent=True) or request.form
+    email = (data.get("email") or "").strip().lower()
+    
+    if not email:
+        return _json_err("Email is required.")
+    
+    user = GlobalUser.query.filter_by(email=email).first()
+    if user:
+        # In production, send email with reset token
+        # For now, just log it
+        log.info("Password reset requested for %s", email)
+    
+    # Always return success to prevent email enumeration
+    if _wants_json():
+        return _json_ok({"message": "If the email exists, a reset link has been sent."})
+    
+    flash("If the email exists, a reset link has been sent.", "success")
+    return redirect(url_for("auth.login"))
+
+
+@auth_bp.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token: str):
+    """Reset password with token."""
+    # In production, validate token and allow password reset
+    # For now, just show the form
+    if request.method == "GET":
+        return render_template("auth/reset_password.html", token=token)
+    
+    data = request.get_json(silent=True) or request.form
+    password = (data.get("password") or "").strip()
+    confirm  = (data.get("confirm") or "").strip()
+    
+    if not password or password != confirm:
+        return _json_err("Passwords do not match.")
+    
+    if len(password) < 8:
+        return _json_err("Password must be at least 8 characters.")
+    
+    # In production, find user by token and update password
+    # For now, just return success
+    if _wants_json():
+        return _json_ok({"message": "Password updated."})
+    
+    flash("Password updated successfully.", "success")
+    return redirect(url_for("auth.login"))

@@ -14,6 +14,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.exceptions import BadRequest
 
 from app.models import db, GlobalUser, Church
+from app.utils.rate_limit import login_rate_limit, api_rate_limit
 
 auth_bp = Blueprint("auth", __name__, template_folder="../../templates/auth")
 
@@ -38,6 +39,7 @@ def _wants_json() -> bool:
 # ---------------------------------------------------------------------------
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@login_rate_limit
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
@@ -94,6 +96,7 @@ def login():
 # ---------------------------------------------------------------------------
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
+@login_rate_limit
 def signup():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))

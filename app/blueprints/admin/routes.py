@@ -9,6 +9,7 @@ from flask_login import login_required, current_user
 
 from app.models import db, GlobalUser, Church
 from app.utils.tenant import open_tenant_db, get_db, mark_dirty
+from app.utils.audit import log_admin_action
 from flask import current_app
 
 admin_bp = Blueprint("admin", __name__, template_folder="../../templates/admin")
@@ -86,6 +87,7 @@ def toggle_member(user_id: int):
         return redirect(url_for("admin.members"))
     user.is_active = not user.is_active
     db.session.commit()
+    log_admin_action("user_toggle", {"user_id": user_id, "is_active": user.is_active})
     flash(f"{'Activated' if user.is_active else 'Suspended'} {user.username}.", "success")
     return redirect(url_for("admin.members"))
 
@@ -100,6 +102,7 @@ def change_role(user_id: int):
     else:
         user.role = new_role
         db.session.commit()
+        log_admin_action("role_change", {"user_id": user_id, "new_role": new_role})
         flash(f"Role updated to {new_role}.", "success")
     return redirect(url_for("admin.members"))
 
@@ -129,6 +132,7 @@ def admin_delete_post(post_id: int):
     conn.execute("UPDATE posts SET is_deleted=1 WHERE id=?", (post_id,))
     conn.commit()
     mark_dirty()
+    log_admin_action("post_delete", {"post_id": post_id})
     flash("Post removed.", "success")
     return redirect(url_for("admin.posts"))
 
@@ -158,6 +162,7 @@ def confirm_giving(record_id: int):
     conn.execute("UPDATE giving SET status='confirmed' WHERE id=?", (record_id,))
     conn.commit()
     mark_dirty()
+    log_admin_action("giving_confirm", {"record_id": record_id})
     flash("Giving record confirmed.", "success")
     return redirect(url_for("admin.giving"))
 
@@ -193,12 +198,13 @@ def create_event():
         flash("Title and start date are required.", "error")
         return redirect(url_for("admin.events"))
 
-    conn.execute(
+    cur = conn.execute(
         """INSERT INTO events (title, description, location, starts_at, ends_at, created_by)
            VALUES (?, ?, ?, ?, ?, ?)""",
         (title, description, location, starts_at, ends_at, member["id"]),
     )
     conn.commit()
     mark_dirty()
+    log_admin_action("event_create", {"event_id": cur.lastrowid, "title": title})
     flash("Event created.", "success")
     return redirect(url_for("admin.events"))

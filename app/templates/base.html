@@ -27,8 +27,10 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-  {% block body %}{% endblock %}
-
+   <a href="#main-content" class="skip-link">Skip to main content</a>
+   <div id="main-content">
+   {% block body %}{% endblock %}
+   </div>
   <!-- Service Worker registration -->
   <script>
     if ('serviceWorker' in navigator) {

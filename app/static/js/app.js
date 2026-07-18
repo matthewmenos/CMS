@@ -159,6 +159,19 @@ function switchView(view) {
   }
 }
 
+// Alias for pushManager
+function showView(view) {
+  switchView(view);
+}
+
+function openPost(postId, openComments = false) {
+  // Open a specific post (used for deep-linking)
+  openComments(postId);
+  if (openComments) {
+    // Comments are already opened by openComments
+  }
+}
+
 // ── Stories ───────────────────────────────────────────────────────────────────
 async function loadStories() {
   const scroll = document.getElementById("stories-scroll");
@@ -1062,5 +1075,125 @@ function timeAgo(iso) {
   return d.toLocaleDateString();
 }
 
-// ── Start ─────────────────────────────────────────────────────────────────────
-boot();
+// ── Push Notifications (Capacitor FCM) ─────────────────────────────────────────
+const pushManager = {
+  async init() {
+    // Check if running in Capacitor
+    if (!window.Capacitor || !window.Capacitor.Plugins.PushNotifications) {
+      console.log("Push notifications not available (not in Capacitor)");
+      return;
+    }
+    
+    const { PushNotifications } = window.Capacitor.Plugins;
+    
+    // Request permissions
+    const permission = await PushNotifications.requestPermissions();
+    if (permission.receive !== "granted") {
+      console.log("Push notification permission denied");
+      return;
+    }
+    
+    // Register for push notifications
+    await PushNotifications.register();
+    
+    // Listen for registration
+    PushNotifications.addListener("registration", async (token) => {
+      console.log("FCM Token received:", token.value);
+      try {
+        await api.post("/api/save-fcm-token", {
+          token: token.value,
+          platform: this.getPlatform(),
+        });
+        console.log("FCM token saved successfully");
+      } catch (err) {
+        console.error("Failed to save FCM token:", err);
+      }
+    });
+    
+    // Listen for push notification received (app in foreground)
+    PushNotifications.addListener("pushNotificationReceived", (msg) => {
+      console.log("Push notification received:", msg);
+      this.handleForegroundNotification(msg);
+    });
+    
+    // Listen for push notification clicked
+    PushNotifications.addListener("pushNotificationActionPerformed", (msg) => {
+      console.log("Push notification action:", msg);
+      this.handleNotificationClick(msg);
+    });
+  },
+  
+  getPlatform() {
+    if (!window.Capacitor) return "android";
+    return window.Capacitor.getPlatform() === "ios" ? "ios" : "android";
+  },
+  
+  handleForegroundNotification(msg) {
+    // Show in-app notification (Instagram-style)
+    const data = msg.data || {};
+    const title = data.title || msg.title || "New Notification";
+    const body = data.body || msg.body || "";
+    
+    // Show toast
+    toast(`${title}: ${body}`);
+    
+    // Update notification badge
+    this.updateBadge();
+  },
+  
+  handleNotificationClick(msg) {
+    const data = msg.data || {};
+    
+    // Deep-link based on notification type
+    if (data.type === "like" && data.post_id) {
+      // Navigate to post
+      this.navigateToPost(data.post_id);
+    } else if (data.type === "comment" && data.post_id) {
+      // Open comments
+      this.navigateToPost(data.post_id, "comments");
+    } else if (data.type === "follow" && data.follower_id) {
+      // Navigate to profile
+      this.navigateToProfile(data.follower_id);
+    } else if (data.type === "rsvp" && data.event_id) {
+      // Navigate to event
+      this.navigateToEvent(data.event_id);
+    }
+  },
+  
+  navigateToPost(postId, openComments = false) {
+    // Switch to feed view and open post
+    showView("feed");
+    openPost(postId, openComments);
+  },
+  
+  navigateToProfile(userId) {
+    // This would need to be implemented based on your routing
+    console.log("Navigate to profile:", userId);
+  },
+  
+  navigateToEvent(eventId) {
+    // This would need to be implemented based on your routing
+    console.log("Navigate to event:", eventId);
+  },
+  
+  async updateBadge() {
+    // Refresh notifications to update unread count
+    try {
+      const { data } = await api.get("/api/notifications");
+      const unread = data.unread_count || 0;
+      const badge = document.getElementById("notif-badge");
+      if (badge) {
+        badge.textContent = unread;
+        badge.hidden = unread === 0;
+      }
+    } catch (err) {
+      console.error("Failed to update notification badge:", err);
+    }
+  },
+};
+
+// Initialize push notifications after boot
+boot().then(() => {
+  // Delay to ensure Capacitor is ready
+  setTimeout(() => pushManager.init(), 1000);
+});

@@ -184,13 +184,46 @@ CREATE TABLE IF NOT EXISTS giving (
     created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
 );
 
+-- Event RSVPs
+CREATE TABLE IF NOT EXISTS event_rsvps (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id   INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    member_id  INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    status     TEXT    DEFAULT 'going',  -- going | interested | not_going
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    UNIQUE(event_id, member_id)
+);
+
+-- Admin audit log
+CREATE TABLE IF NOT EXISTS admin_audit (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER REFERENCES members(id) ON DELETE SET NULL,
+    action     TEXT    NOT NULL,
+    details    TEXT    DEFAULT '',
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
+);
+
+-- Device tokens for push notifications
+CREATE TABLE IF NOT EXISTS device_tokens (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id  INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    fcm_token  TEXT    NOT NULL,
+    platform   TEXT    DEFAULT 'android',  -- android | ios
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    last_used  TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    UNIQUE(member_id, fcm_token)
+);
+
 -- Performance indexes
+CREATE INDEX IF NOT EXISTS idx_rsvps_event ON event_rsvps(event_id, status);
 CREATE INDEX IF NOT EXISTS idx_posts_member   ON posts(member_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_posts_type     ON posts(media_type, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_likes_post     ON likes(post_id);
 CREATE INDEX IF NOT EXISTS idx_comments_post  ON comments(post_id, created_at ASC);
 CREATE INDEX IF NOT EXISTS idx_notif_recipient ON notifications(recipient_id, is_read, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_stories_member  ON stories(member_id, expires_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_user     ON admin_audit(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_device_tokens_member ON device_tokens(member_id);
 """
 
 

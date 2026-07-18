@@ -33,6 +33,7 @@ from app.utils.r2 import (
     allowed_content_type,
     delete_object,
 )
+from app.utils.rate_limit import upload_rate_limit, giving_rate_limit
 
 api_bp = Blueprint("api", __name__)
 
@@ -62,6 +63,7 @@ def _current_member(conn):
 @api_bp.post("/upload/presign")
 @login_required
 @require_tenant
+@upload_rate_limit
 def presign_upload():
     body         = request.get_json(silent=True) or {}
     content_type = body.get("content_type", "")
@@ -533,6 +535,7 @@ def mark_notifications_read():
 @api_bp.post("/give")
 @login_required
 @require_tenant
+@giving_rate_limit
 def give():
     conn   = get_db()
     member = _current_member(conn)
@@ -585,6 +588,84 @@ def get_events():
 
 
 # ---------------------------------------------------------------------------
+# EVENT RSVP
+# ---------------------------------------------------------------------------
+
+@api_bp.post("/events/<int:event_id>/rsvp")
+@login_required
+@require_tenant
+def rsvp_event(event_id: int):
+    conn   = get_db()
+    member = _current_member(conn)
+    body   = request.get_json(silent=True) or {}
+    
+    status = (body.get("status") or "going").strip()
+    if status not in ("going", "interested", "not_going"):
+        return _err("Invalid RSVP status.")
+    
+    # Check event exists
+    event = conn.execute("SELECT id FROM events WHERE id=?", (event_id,)).fetchone()
+    if not event:
+        return _err("Event not found.", 404)
+    
+    conn.execute(
+        "INSERT OR REPLACE INTO event_rsvps (event_id, member_id, status) VALUES (?, ?, ?)",
+        (event_id, member["id"], status),
+    )
+    conn.commit()
+    mark_dirty()
+    
+    return _ok({"status": status})
+
+
+# ---------------------------------------------------------------------------
+# FCM TOKEN REGISTRATION
+# ---------------------------------------------------------------------------
+
+@api_bp.post("/save-fcm-token")
+@login_required
+@require_tenant
+def save_fcm_token():
+    """Save or update a device's FCM token for push notifications."""
+    conn   = get_db()
+    member = _current_member(conn)
+    body   = request.get_json(silent=True) or {}
+    
+    token    = (body.get("token") or "").strip()
+    platform = (body.get("platform") or "android").strip()
+    
+    if not token:
+        return _err("FCM token is required.")
+    
+    if platform not in ("android", "ios"):
+        platform = "android"
+    
+    # Check if token already exists
+    existing = conn.execute(
+        "SELECT id FROM device_tokens WHERE member_id = ? AND fcm_token = ?",
+        (member["id"], token),
+    ).fetchone()
+    
+    if existing:
+        # Update last_used timestamp
+        conn.execute(
+            "UPDATE device_tokens SET last_used = (strftime('%Y-%m-%dT%H:%M:%SZ','now')) WHERE id = ?",
+            (existing["id"],),
+        )
+    else:
+        # Insert new token
+        conn.execute(
+            "INSERT INTO device_tokens (member_id, fcm_token, platform) VALUES (?, ?, ?)",
+            (member["id"], token, platform),
+        )
+    
+    conn.commit()
+    mark_dirty()
+    
+    return _ok({"saved": True})
+
+
+# ---------------------------------------------------------------------------
 # SEARCH
 # ---------------------------------------------------------------------------
 
@@ -599,25 +680,72 @@ def search():
         return _ok([])
 
     pattern = f"%{q}%"
+    results = []
+    
+    # Search members
     rows = conn.execute(
         """SELECT m.*, u.username FROM members m
            JOIN global_users u ON u.id = m.global_user_id
            WHERE m.display_name LIKE ? OR u.username LIKE ?
-           LIMIT 20""",
+           LIMIT 15""",
         (pattern, pattern),
     ).fetchall()
 
-    # NOTE: global_users is in the global DB; we join username from global_user_id
     from app.models import GlobalUser
-    results = []
     for r in rows:
         r = dict(r)
         gu = GlobalUser.query.get(r["global_user_id"])
         results.append({
-            "username":     gu.username if gu else "",
+            "type": "member",
+            "username": gu.username if gu else "",
             "display_name": r["display_name"],
-            "avatar_url":   public_media_url(r["avatar_key"]) if r["avatar_key"] else "",
+            "avatar_url": public_media_url(r["avatar_key"]) if r["avatar_key"] else "",
             "follower_count": r["follower_count"],
+        })
+    
+    # Search posts (captions)
+    post_rows = conn.execute(
+        """SELECT p.id, p.caption, p.media_key, p.media_type, p.like_count, p.comment_count,
+                  m.display_name, m.avatar_key
+           FROM posts p
+           JOIN members m ON m.id = p.member_id
+           WHERE p.is_deleted = 0 AND p.caption LIKE ?
+           ORDER BY p.id DESC LIMIT 10""",
+        (pattern,),
+    ).fetchall()
+    
+    for r in post_rows:
+        r = dict(r)
+        results.append({
+            "type": "post",
+            "id": r["id"],
+            "caption": r["caption"][:100] if r["caption"] else "",
+            "media_url": public_media_url(r["media_key"]),
+            "display_name": r["display_name"],
+            "avatar_url": public_media_url(r["avatar_key"]) if r["avatar_key"] else "",
+            "like_count": r["like_count"],
+            "comment_count": r["comment_count"],
+        })
+    
+    # Search events
+    event_rows = conn.execute(
+        """SELECT e.id, e.title, e.description, e.location, e.starts_at, e.banner_key
+           FROM events e
+           WHERE e.title LIKE ? OR e.description LIKE ?
+           ORDER BY e.starts_at ASC LIMIT 10""",
+        (pattern, pattern),
+    ).fetchall()
+    
+    for r in event_rows:
+        r = dict(r)
+        results.append({
+            "type": "event",
+            "id": r["id"],
+            "title": r["title"],
+            "description": r["description"][:100] if r["description"] else "",
+            "location": r["location"],
+            "starts_at": r["starts_at"],
+            "banner_url": public_media_url(r["banner_key"]) if r.get("banner_key") else "",
         })
 
     return _ok(results)

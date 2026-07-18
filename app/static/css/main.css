@@ -1498,7 +1498,8 @@ select.form-input { cursor: pointer; }
   top: 0;
   left: 0;
   bottom: 0;
-  width: 260px;
+  width: 280px;
+  max-width: 85vw;
   background: var(--bg-card);
   border-right: 1px solid var(--border);
   z-index: 180;
@@ -1506,6 +1507,7 @@ select.form-input { cursor: pointer; }
   flex-direction: column;
   transform: translateX(-100%);
   transition: transform var(--t-med);
+  box-shadow: var(--shadow-lg);
 }
 .app-sidebar.open {
   transform: translateX(0);
@@ -1517,17 +1519,18 @@ select.form-input { cursor: pointer; }
   z-index: 170;
 }
 .sidebar-header {
-  padding: 16px;
+  padding: 20px 16px 16px;
   border-bottom: 1px solid var(--border);
 }
 .sidebar-close {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   color: var(--text-2);
+  margin-left: auto;
 }
 .sidebar-close:hover {
   background: var(--bg-hover);
@@ -1535,15 +1538,18 @@ select.form-input { cursor: pointer; }
 .app-sidebar .sidebar-nav {
   display: flex;
   flex-direction: column;
-  padding: 12px 0;
+  padding: 8px 0;
 }
 .app-sidebar .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 20px;
+  gap: 16px;
+  padding: 14px 20px;
   color: var(--text);
   font-weight: 500;
+  font-size: 15px;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-right: 8px;
 }
 .app-sidebar .sidebar-link:hover {
   background: var(--bg-hover);
@@ -1551,6 +1557,89 @@ select.form-input { cursor: pointer; }
 .app-sidebar .sidebar-link--danger {
   color: var(--danger);
   margin-top: auto;
+}
+
+/* ── Responsive improvements ─────────────────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --header-h: 48px;
+    --nav-h: 52px;
+  }
+  
+  .header-inner {
+    padding: 0 12px;
+  }
+  
+  .header-church-name {
+    font-size: 14px;
+  }
+  
+  .nav-btn {
+    font-size: 9px;
+    min-height: 48px;
+  }
+  
+  .nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .post-header {
+    padding: 10px 12px 8px;
+  }
+  
+  .post-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .post-meta {
+    gap: 2px;
+  }
+  
+  .post-username {
+    font-size: 13px;
+  }
+  
+  .post-actions {
+    padding: 4px 8px 2px;
+  }
+  
+  .action-btn {
+    width: 34px;
+    height: 34px;
+  }
+  
+  .post-info {
+    padding: 2px 12px 12px;
+  }
+  
+  .modal {
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+  
+  .modal-header {
+    padding: 10px 12px;
+  }
+  
+  .modal-title {
+    font-size: 14px;
+  }
+  
+  .modal-body {
+    padding: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  #app-root {
+    max-width: 600px;
+  }
+  
+  .app-sidebar {
+    width: 300px;
+    max-width: none;
+  }
 }
 
 /* ── Stories Viewer ────────────────────────────────────────────── */

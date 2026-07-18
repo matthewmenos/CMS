@@ -1,0 +1,57 @@
+/* Create Post/Story page styles */
+.create-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--t-fast), background var(--t-fast);
+  cursor: pointer;
+  background: var(--bg-card);
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--primary);
+  background: var(--blue-50);
+}
+[data-theme="dark"] .drop-zone:hover,
+[data-theme="dark"] .drop-zone.dragover { background: rgba(66,165,245,.08); }
+
+.drop-zone-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  text-align: center;
+}
+.drop-zone-icon { color: var(--text-3); }
+.drop-zone-text { font-size: 16px; font-weight: 600; color: var(--text-2); }
+.drop-zone-hint { font-size: 13px; color: var(--text-3); }
+
+.upload-preview {
+  position: relative;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.upload-preview img,
+.upload-preview video {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+}
+
+.post-meta-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.caption-input {
+  resize: none;
+  width: 100%;
+  min-height: 80px;

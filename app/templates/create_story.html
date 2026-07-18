@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Create Story — COP Agona Ahanta{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create.css') }}" />
+{% endblock %}
+
+{% block body %}
+<div id="app-root">
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="/" class="header-brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        <span class="header-church-name">Create Story</span>
+      </a>
+      <div class="header-actions">
+        <button class="btn btn-primary btn-sm" id="btn-submit-story">Share to Story</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main" id="create-main">
+    <div class="create-container">
+      <!-- Drop zone -->
+      <div class="drop-zone" id="story-drop-zone">
+        <div class="drop-zone-inner">
+          <div class="drop-zone-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="60" height="60">
+              <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/>
+            </svg>
+          </div>
+          <p class="drop-zone-text">Add to your story</p>
+          <p class="drop-zone-hint">Photos and videos (24h expiry)</p>
+          <button class="btn btn-primary" type="button" id="btn-browse-story">Browse files</button>
+        </div>
+        <input type="file" id="story-file-input" accept="image/*,video/*" hidden />
+      </div>
+
+      <!-- Preview -->
+      <div class="upload-preview" id="story-preview" hidden>
+        <img id="story-preview-img" alt="Preview" />
+        <video id="story-preview-vid" autoplay loop muted hidden></video>
+        <button class="btn btn-ghost btn-sm" id="btn-change-story" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Change
+        </button>
+      </div>
+
+      <!-- Upload progress -->
+      <div class="upload-progress" id="story-upload-progress" hidden>
+        <div class="upload-progress-ring">
+          <svg viewBox="0 0 44 44" width="64" height="64">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="var(--border)" stroke-width="3"/>
+            <circle cx="22" cy="22" r="18" fill="none" stroke="var(--primary)" stroke-width="3"
+                    stroke-dasharray="113" stroke-dashoffset="113" id="story-progress-ring-fill"
+                    stroke-linecap="round" transform="rotate(-90 22 22)"/>
+          </svg>
+          <span class="upload-pct" id="story-upload-pct">0%</span>
+        </div>
+        <p id="story-progress-label">Uploading…</p>
+      </div>
+
+      <!-- Caption form -->
+      <div class="post-meta-form" id="story-form" hidden>
+        <textarea id="story-caption" class="form-input caption-input"
+                  placeholder="Add text to your story…" rows="2" maxlength="200"></textarea>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="{{ url_for('static', filename='js/create_story.js') }}" type="module"></script>
+{% endblock %}

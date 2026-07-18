@@ -50,6 +50,18 @@ def messages():
     return render_template("messages.html")
 
 
+@main_bp.route("/create")
+@login_required
+def create_post():
+    return render_template("create_post.html")
+
+
+@main_bp.route("/create/story")
+@login_required
+def create_story():
+    return render_template("create_story.html")
+
+
 @main_bp.route("/praise")
 @login_required
 def praise():

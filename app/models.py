@@ -226,6 +226,66 @@ CREATE TABLE IF NOT EXISTS prayer_requests (
     answered_at TEXT,
 );
 
+-- Messages/Chat
+CREATE TABLE IF NOT EXISTS messages (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    sender_id  INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    recipient_id INTEGER REFERENCES members(id) ON DELETE CASCADE,
+    group_id   INTEGER REFERENCES groups(id) ON DELETE CASCADE,
+    body       TEXT    DEFAULT '',
+    media_key  TEXT    DEFAULT '',
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    is_read    INTEGER DEFAULT 0,
+);
+
+-- Message threads (for grouping)
+CREATE TABLE IF NOT EXISTS message_threads (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    member1_id INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    member2_id INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    last_message_at TEXT,
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    UNIQUE(member1_id, member2_id)
+);
+
+-- Groups (for small groups, ministries)
+CREATE TABLE IF NOT EXISTS groups (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT    NOT NULL,
+    description TEXT    DEFAULT '',
+    avatar_key TEXT    DEFAULT '',
+    created_by INTEGER REFERENCES members(id) ON DELETE SET NULL,
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    is_public  INTEGER DEFAULT 1,
+);
+
+-- Group members
+CREATE TABLE IF NOT EXISTS group_members (
+    group_id   INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+    member_id  INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    joined_at  TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    PRIMARY KEY (group_id, member_id)
+);
+
+-- Child check-in
+CREATE TABLE IF NOT EXISTS children (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    parent_id  INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    first_name TEXT    NOT NULL,
+    last_name  TEXT    NOT NULL,
+    date_of_birth TEXT,
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+);
+
+CREATE TABLE IF NOT EXISTS checkins (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    child_id   INTEGER NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+    checked_in_by INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    checkin_time TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    security_key TEXT    NOT NULL,
+    checkout_time TEXT,
+);
+
 -- Performance indexes
 CREATE INDEX IF NOT EXISTS idx_rsvps_event ON event_rsvps(event_id, status);
 CREATE INDEX IF NOT EXISTS idx_posts_member   ON posts(member_id, created_at DESC);
@@ -237,6 +297,10 @@ CREATE INDEX IF NOT EXISTS idx_stories_member  ON stories(member_id, expires_at 
 CREATE INDEX IF NOT EXISTS idx_audit_user     ON admin_audit(user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_device_tokens_member ON device_tokens(member_id);
 CREATE INDEX IF NOT EXISTS idx_prayer_requests_member ON prayer_requests(member_id);
+CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_messages_recipient ON messages(recipient_id);
+CREATE INDEX IF NOT EXISTS idx_messages_group ON messages(group_id);
+CREATE INDEX IF NOT EXISTS idx_children_parent ON children(parent_id);
 """
 
 

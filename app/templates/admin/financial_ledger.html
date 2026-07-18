@@ -1,0 +1,62 @@
+{% extends "admin/base_admin.html" %}
+{% block page_title %}Financial Ledger{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ledger.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="ledger-header">
+  <div class="ledger-summary">
+    <div class="stat-card">
+      <div class="stat-value">GHS {{ "%.2f"|format(total_giving) }}</div>
+      <div class="stat-label">Total Giving (All Time)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">GHS {{ "%.2f"|format(month_giving) }}</div>
+      <div class="stat-label">This Month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ record_count }}</div>
+      <div class="stat-label">Transactions</div>
+    </div>
+  </div>
+  <div class="ledger-actions">
+    <a href="{{ url_for('admin.download_ledger') }}" class="btn btn-outline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7,10 12,15 17,10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Download PDF
+    </a>
+  </div>
+</div>
+
+<table class="admin-table ledger-table">
+  <thead>
+    <tr>
+      <th>#</th><th>Date</th><th>Member</th><th>Amount</th><th>Category</th><th>Status</th><th>Reference</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in records %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.created_at[:16] }}</td>
+      <td>{{ r.display_name or '—' }}</td>
+      <td class="amount-cell">GHS {{ "%.2f"|format(r.amount) }}</td>
+      <td>{{ r.category }}</td>
+      <td>
+        <span class="badge-status {% if r.status=='confirmed' %}badge-status--confirmed{% elif r.status=='failed' %}badge-status--failed{% else %}badge-status--pending{% endif %}">
+          {{ r.status }}
+        </span>
+      </td>
+      <td class="ref-cell"><code>{{ r.reference }}</code></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="empty-row">No giving records found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

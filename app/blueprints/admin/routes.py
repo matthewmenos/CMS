@@ -4,6 +4,7 @@ Accessible only to users with role='admin'.
 """
 
 from functools import wraps
+from datetime import datetime, timezone
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, abort
 from flask_login import login_required, current_user
 
@@ -208,3 +209,132 @@ def create_event():
     log_admin_action("event_create", {"event_id": cur.lastrowid, "title": title})
     flash("Event created.", "success")
     return redirect(url_for("admin.events"))
+
+
+# ---------------------------------------------------------------------------
+# CHILD CHECK-IN
+# ---------------------------------------------------------------------------
+
+@admin_bp.get("/checkin")
+@admin_required
+def child_checkin():
+    conn = _open_tenant()
+    
+    # Get today's check-ins
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    checkins = conn.execute(
+        """SELECT c.id, c.checkin_time, c.checkout_time, c.security_key,
+                  ch.first_name || ' ' || ch.last_name as child_name,
+                  p.display_name as parent_name
+           FROM checkins c
+           JOIN children ch ON ch.id = c.child_id
+           JOIN members p ON p.id = ch.parent_id
+           WHERE date(c.checkin_time) = date('now')
+           ORDER BY c.checkin_time DESC"""
+    ).fetchall()
+    
+    users = GlobalUser.query.order_by(GlobalUser.username).all()
+    
+    return render_template("admin/child_checkin.html",
+                           checkins=[dict(c) for c in checkins],
+                           users=users,
+                           church_name=current_app.config["CHURCH_NAME"])
+
+
+@admin_bp.post("/checkin")
+@admin_required
+def checkin_child():
+    conn   = _open_tenant()
+    from app.utils.tenant import get_or_create_member
+    staff = get_or_create_member(conn, current_user.id, current_user.username)
+    
+    first_name = request.form.get("first_name", "").strip()
+    last_name  = request.form.get("last_name", "").strip()
+    dob        = request.form.get("date_of_birth", "").strip() or None
+    parent_id  = request.form.get("parent_id", "").strip()
+    
+    if not first_name or not last_name or not parent_id:
+        flash("All fields are required.", "error")
+        return redirect(url_for("admin.child_checkin"))
+    
+    # Create child record
+    cur = conn.execute(
+        "INSERT INTO children (parent_id, first_name, last_name, date_of_birth) VALUES (?, ?, ?, ?)",
+        (parent_id, first_name, last_name, dob),
+    )
+    
+    # Generate security key
+    import secrets
+    security_key = secrets.token_hex(4).upper()
+    
+    # Create check-in
+    conn.execute(
+        "INSERT INTO checkins (child_id, checked_in_by, security_key) VALUES (?, ?, ?)",
+        (cur.lastrowid, staff["id"], security_key),
+    )
+    
+    conn.commit()
+    mark_dirty()
+    log_admin_action("child_checkin", {"child_id": cur.lastrowid, "parent_id": parent_id})
+    flash(f"Child checked in. Security key: {security_key}", "success")
+    return redirect(url_for("admin.child_checkin"))
+
+
+@admin_bp.post("/checkin/<int:checkin_id>/checkout")
+@admin_required
+def checkout_child(checkin_id: int):
+    conn = _open_tenant()
+    
+    conn.execute(
+        "UPDATE checkins SET checkout_time = (strftime('%Y-%m-%dT%H:%M:%SZ','now')) WHERE id = ?",
+        (checkin_id,),
+    )
+    conn.commit()
+    mark_dirty()
+    log_admin_action("child_checkout", {"checkin_id": checkin_id})
+    flash("Child checked out.", "success")
+    return redirect(url_for("admin.child_checkin"))
+
+
+# ---------------------------------------------------------------------------
+# FINANCIAL LEDGER
+# ---------------------------------------------------------------------------
+
+@admin_bp.get("/ledger")
+@admin_required
+def financial_ledger():
+    conn = _open_tenant()
+    
+    # Get all giving records
+    records = conn.execute(
+        """SELECT g.*, m.display_name
+           FROM giving g
+           LEFT JOIN members m ON m.id = g.member_id
+           ORDER BY g.id DESC LIMIT 100"""
+    ).fetchall()
+    
+    # Calculate totals
+    total = conn.execute(
+        "SELECT COALESCE(SUM(amount), 0) as total FROM giving WHERE status='confirmed'"
+    ).fetchone()
+    
+    month_total = conn.execute(
+        "SELECT COALESCE(SUM(amount), 0) as total FROM giving WHERE status='confirmed' AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')"
+    ).fetchone()
+    
+    return render_template("admin/financial_ledger.html",
+                           records=[dict(r) for r in records],
+                           total_giving=total["total"],
+                           month_giving=month_total["total"],
+                           record_count=len(records),
+                           church_name=current_app.config["CHURCH_NAME"])
+
+
+@admin_bp.get("/ledger/download")
+@admin_required
+def download_ledger():
+    """Generate and download PDF ledger (placeholder for now)."""
+    from flask import Response
+    # In production, generate PDF using reportlab or weasyprint
+    flash("PDF download coming soon.", "info")
+    return redirect(url_for("admin.financial_ledger"))

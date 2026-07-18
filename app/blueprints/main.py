@@ -23,7 +23,7 @@ def explore():
 @main_bp.route("/reels")
 @login_required
 def reels():
-    return render_template("index.html")
+    return render_template("reels.html")
 
 
 @main_bp.route("/give")
@@ -36,3 +36,21 @@ def give():
 @login_required
 def profile():
     return render_template("index.html")
+
+
+@main_bp.route("/stories")
+@login_required
+def stories():
+    return render_template("stories.html")
+
+
+@main_bp.route("/messages")
+@login_required
+def messages():
+    return render_template("messages.html")
+
+
+@main_bp.route("/praise")
+@login_required
+def praise():
+    return render_template("praise.html")

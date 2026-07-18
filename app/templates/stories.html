@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Stories — COP Agona Ahanta{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stories.css') }}" />
+{% endblock %}
+
+{% block body %}
+<div id="app-root">
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="/" class="header-brand">
+        <span class="header-church-name">Stories</span>
+      </a>
+      <div class="header-actions">
+        <button class="hdr-btn" id="btn-close-stories" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main" id="stories-main">
+    <div class="story-viewer-container" id="story-viewer-container">
+      <div class="story-progress-bar" id="story-progress-bar"></div>
+      <div class="story-content" id="story-content">
+        <div class="story-header">
+          <img class="story-avatar" id="story-avatar" src="" alt="" />
+          <span class="story-username" id="story-username"></span>
+          <time class="story-time" id="story-time"></time>
+        </div>
+        <div class="story-media-container" id="story-media-container">
+          <img class="story-media" id="story-image" src="" alt="" hidden />
+          <video class="story-media" id="story-video" src="" autoplay loop hidden></video>
+        </div>
+        <div class="story-caption" id="story-caption"></div>
+      </div>
+      <button class="story-nav story-nav--prev" id="story-prev" aria-label="Previous">&#8249;</button>
+      <button class="story-nav story-nav--next" id="story-next" aria-label="Next">&#8250;</button>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/stories.js') }}" type="module"></script>
+{% endblock %}

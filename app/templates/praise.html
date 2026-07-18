@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Prayer Wall — COP Agona Ahanta{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/praise.css') }}" />
+{% endblock %}
+
+{% block body %}
+<div id="app-root">
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="/" class="header-brand">
+        <span class="header-church-name">Prayer Wall</span>
+      </a>
+      <div class="header-actions">
+        <button class="hdr-btn" id="btn-new-prayer" aria-label="New prayer request">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main" id="praise-main">
+    <div class="praise-container" id="praise-container">
+      <!-- Prayer requests will be loaded here -->
+    </div>
+  </main>
+</div>
+
+<!-- New Prayer Request Modal -->
+<div class="modal-overlay" id="modal-prayer" hidden>
+  <div class="modal modal--sheet">
+    <div class="modal-drag-handle"></div>
+    <div class="modal-header">
+      <button class="modal-close-btn" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <h2 class="modal-title">New Prayer Request</h2>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="prayer-title" class="form-input" placeholder="Prayer topic" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label>Details</label>
+        <textarea id="prayer-body" class="form-input" placeholder="Share what you'd like us to pray for..." rows="3" maxlength="1000"></textarea>
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" id="prayer-public" checked /> Make this public</label>
+      </div>
+      <button class="btn btn-primary btn-full" id="btn-submit-prayer">Post Prayer Request</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/praise.js') }}" type="module"></script>
+{% endblock %}

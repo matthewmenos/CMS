@@ -106,6 +106,7 @@ async function boot() {
   initNav();
   initNewPost();
   initNotifications();
+  initSidebar();
 
   // Load non-critical data in parallel, silently ignoring failures
   await Promise.allSettled([loadStories(), loadFeed(), loadNotifCount()]);
@@ -132,6 +133,33 @@ function initNav() {
       loadFeed();
     }
   }, { passive: true });
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────
+function initSidebar() {
+  const sidebar = document.getElementById("app-sidebar");
+  const overlay = document.getElementById("sidebar-overlay");
+  const menuBtn = document.getElementById("btn-menu");
+  const closeBtn = document.querySelector(".sidebar-close");
+
+  if (!sidebar) return;
+
+  const openSidebar = () => {
+    sidebar.classList.add("open");
+    sidebar.hidden = false;
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeSidebar = () => {
+    sidebar.classList.remove("open");
+    overlay.hidden = true;
+    document.body.style.overflow = "";
+  };
+
+  if (menuBtn) menuBtn.addEventListener("click", openSidebar);
+  if (closeBtn) closeBtn.addEventListener("click", closeSidebar);
+  if (overlay) overlay.addEventListener("click", closeSidebar);
 }
 
 const _viewLoaded = {};

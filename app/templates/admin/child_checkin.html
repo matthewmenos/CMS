@@ -1,0 +1,73 @@
+{% extends "admin/base_admin.html" %}
+{% block page_title %}Child Check-in{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/checkin.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="checkin-container">
+  <div class="checkin-search">
+    <input type="text" id="search-family" class="form-input" placeholder="Search by parent name or phone..." />
+    <button class="btn btn-primary" id="btn-search-family">Search</button>
+  </div>
+
+  <div class="checkin-form" id="checkin-form" hidden>
+    <h3 class="section-title">Check-in Child</h3>
+    <form method="POST" action="{{ url_for('admin.checkin_child') }}">
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="child-first-name">First Name</label>
+          <input type="text" id="child-first-name" name="first_name" class="form-input" required />
+        </div>
+        <div class="field">
+          <label class="field-label" for="child-last-name">Last Name</label>
+          <input type="text" id="child-last-name" name="last_name" class="form-input" required />
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="child-dob">Date of Birth</label>
+        <input type="date" id="child-dob" name="date_of_birth" class="form-input" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="parent-id">Parent</label>
+        <select id="parent-id" name="parent_id" class="form-input" required>
+          <option value="">Select parent...</option>
+          {% for user in users %}
+          <option value="{{ user.id }}">{{ user.username }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Check In</button>
+    </form>
+  </div>
+
+  <h3 class="section-title">Today's Check-ins</h3>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Child</th><th>Parent</th><th>Time In</th><th>Security Key</th><th>Time Out</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for checkin in checkins %}
+      <tr>
+        <td>{{ checkin.child_name }}</td>
+        <td>{{ checkin.parent_name }}</td>
+        <td>{{ checkin.checkin_time[:16] }}</td>
+        <td><code class="security-key">{{ checkin.security_key }}</code></td>
+        <td>{{ checkin.checkout_time or '—' }}</td>
+        <td>
+          {% if not checkin.checkout_time %}
+          <form method="POST" action="{{ url_for('admin.checkout_child', checkin_id=checkin.id) }}">
+            <button class="btn btn-sm btn-success">Check Out</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty-row">No check-ins today.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

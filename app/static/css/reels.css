@@ -1,0 +1,64 @@
+/* Reels viewer specific styles */
+.reels-container {
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+}
+.reel-item {
+  position: relative;
+  height: 100dvh;
+  scroll-snap-align: center;
+}
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.reel-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: #fff;
+}
+.reel-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.reel-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.reel-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+.reel-caption {
+  font-size: 14px;
+  margin-top: 4px;
+}
+.reel-actions {
+  position: absolute;
+  right: 16px;
+  bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.reel-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  background: transparent;
+}
+.reel-action-count {
+  font-size: 12px;
+}

@@ -4,6 +4,9 @@
 {% block body %}
 <div id="app-root">
 
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════════════════════ -->
+  {% include "sidebar.html" %}
+
   <!-- ══ HEADER ══════════════════════════════════════════════════════════════ -->
   <header class="app-header" id="app-header">
     <div class="header-inner">
@@ -17,6 +20,13 @@
       </a>
 
       <div class="header-actions">
+        <!-- Menu button -->
+        <button class="hdr-btn" id="btn-menu" aria-label="Menu">
+          <svg class="hdr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+
         <!-- Theme toggle -->
         <button class="hdr-btn" id="btn-theme-toggle" aria-label="Toggle theme" data-theme="light">
           <svg class="hdr-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

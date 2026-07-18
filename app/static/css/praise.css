@@ -1,0 +1,50 @@
+/* Prayer wall specific styles */
+.prayer-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.prayer-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.prayer-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+.prayer-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+.prayer-time {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-left: auto;
+}
+.prayer-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+.prayer-body {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-bottom: 12px;
+}
+.prayer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.prayer-answered {
+  background: var(--success);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+}

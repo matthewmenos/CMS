@@ -1,0 +1,28 @@
+/* Child check-in specific styles */
+.checkin-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-lg);
+}
+.checkin-search {
+  display: flex;
+  gap: var(--sp-sm);
+}
+.checkin-form {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-md);
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-sm);
+}
+.security-key {
+  font-family: monospace;
+  background: var(--yellow-100);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}

@@ -1491,3 +1491,330 @@ select.form-input { cursor: pointer; }
 @media (min-width: 1100px) {
   .auth-form-panel { flex: 0 0 480px; }
 }
+
+/* ── App Sidebar ────────────────────────────────────────────── */
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  z-index: 180;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform var(--t-med);
+}
+.app-sidebar.open {
+  transform: translateX(0);
+}
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  z-index: 170;
+}
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+}
+.sidebar-close:hover {
+  background: var(--bg-hover);
+}
+.app-sidebar .sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+}
+.app-sidebar .sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  color: var(--text);
+  font-weight: 500;
+}
+.app-sidebar .sidebar-link:hover {
+  background: var(--bg-hover);
+}
+.app-sidebar .sidebar-link--danger {
+  color: var(--danger);
+  margin-top: auto;
+}
+
+/* ── Stories Viewer ────────────────────────────────────────────── */
+.story-viewer-container {
+  position: relative;
+  height: 100dvh;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.story-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  display: flex;
+  gap: 2px;
+  padding: 8px;
+}
+.story-progress-segment {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+}
+.story-progress-segment.active {
+  background: #fff;
+}
+.story-content {
+  max-width: 100%;
+  max-height: 100%;
+}
+.story-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 40px 16px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+.story-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.story-username {
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+}
+.story-time {
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  margin-left: auto;
+}
+.story-media-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+}
+.story-media {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.story-caption {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  color: #fff;
+  font-size: 15px;
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+}
+.story-nav {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  background: transparent;
+  color: #fff;
+  font-size: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.story-nav--prev { left: 0; }
+.story-nav--next { right: 0; }
+
+/* ── Reels ────────────────────────────────────────────────────── */
+.reels-container {
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+}
+.reel-item {
+  position: relative;
+  height: 100dvh;
+  scroll-snap-align: center;
+}
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.reel-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: #fff;
+}
+.reel-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.reel-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.reel-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+.reel-caption {
+  font-size: 14px;
+  margin-top: 4px;
+}
+.reel-actions {
+  position: absolute;
+  right: 16px;
+  bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.reel-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  background: transparent;
+}
+.reel-action-count {
+  font-size: 12px;
+}
+
+/* ── Messages ─────────────────────────────────────────────────── */
+.conversations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+}
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+}
+.conversation-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+.conversation-info {
+  flex: 1;
+}
+.conversation-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+.conversation-preview {
+  font-size: 13px;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+.conversation-time {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* ── Prayer Wall ───────────────────────────────────────────────── */
+.prayer-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.prayer-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.prayer-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+.prayer-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+.prayer-time {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-left: auto;
+}
+.prayer-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+.prayer-body {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-bottom: 12px;
+}
+.prayer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.prayer-answered {
+  background: var(--success);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+}
+
+/* ── Financial Ledger ─────────────────────────────────────────── */
+.ledger-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--sp-lg);
+}
+.ledger-summary {
+  display: flex;
+  gap: var(--sp-md);
+}
+.ledger-actions {
+  display: flex;
+  gap: var(--sp-sm);
+}

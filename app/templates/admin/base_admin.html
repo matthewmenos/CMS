@@ -6,6 +6,7 @@
   <title>{% block title %}Admin — COP Agona Ahanta{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+  {% block extra_css %}{% endblock %}
 </head>
 <body class="admin-body">
 
@@ -21,6 +22,8 @@
     <a href="{{ url_for('admin.posts') }}"    class="sidebar-link {% if request.endpoint=='admin.posts'    %}active{% endif %}">Posts</a>
     <a href="{{ url_for('admin.giving') }}"   class="sidebar-link {% if request.endpoint=='admin.giving'   %}active{% endif %}">Giving</a>
     <a href="{{ url_for('admin.events') }}"   class="sidebar-link {% if request.endpoint=='admin.events'   %}active{% endif %}">Events</a>
+    <a href="{{ url_for('admin.child_checkin') }}" class="sidebar-link {% if request.endpoint=='admin.child_checkin' %}active{% endif %}">Check-in</a>
+    <a href="{{ url_for('admin.financial_ledger') }}" class="sidebar-link {% if request.endpoint=='admin.financial_ledger' %}active{% endif %}">Ledger</a>
     <a href="{{ url_for('auth.logout') }}"    class="sidebar-link sidebar-link--danger">Sign Out</a>
   </nav>
 </aside>

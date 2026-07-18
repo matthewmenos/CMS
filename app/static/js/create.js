@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     dropZone.hidden = true;
     previewEl.hidden = false;
     postForm.hidden = false;
+    btnSubmit.disabled = false;
     
     const isVid = file.type.startsWith('video/');
     previewImg.hidden = isVid;
@@ -69,6 +70,21 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       previewImg.src = url;
     }
+  };
+  
+  // Reset form
+  const resetForm = () => {
+    selectedFile = null;
+    dropZone.hidden = false;
+    previewEl.hidden = true;
+    postForm.hidden = true;
+    progressWrap.hidden = true;
+    btnSubmit.disabled = true;
+    previewImg.src = '';
+    previewVid.src = '';
+    fileInput.value = '';
+    document.getElementById('post-caption').value = '';
+    document.getElementById('post-location').value = '';
   };
 
   // Event listeners

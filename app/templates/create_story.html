@@ -9,14 +9,14 @@
 <div id="app-root">
   <header class="app-header">
     <div class="header-inner">
-      <a href="/" class="header-brand">
+      <a href="/" class="header-brand" aria-label="Back">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
-        <span class="header-church-name">Create Story</span>
+        <span class="header-church-name">New Story</span>
       </a>
       <div class="header-actions">
-        <button class="btn btn-primary btn-sm" id="btn-submit-story">Share to Story</button>
+        <button class="btn btn-primary btn-sm" id="btn-submit-story" disabled>Share</button>
       </div>
     </div>
   </header>
@@ -27,23 +27,25 @@
       <div class="drop-zone" id="story-drop-zone">
         <div class="drop-zone-inner">
           <div class="drop-zone-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="60" height="60">
-              <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64">
+              <path d="M12 5v14"/><path d="M5 12h14"/>
             </svg>
           </div>
           <p class="drop-zone-text">Add to your story</p>
-          <p class="drop-zone-hint">Photos and videos (24h expiry)</p>
-          <button class="btn btn-primary" type="button" id="btn-browse-story">Browse files</button>
+          <p class="drop-zone-hint">Photos and videos • 24 hour expiry</p>
+          <button class="btn btn-primary" type="button" id="btn-browse-story">Select from device</button>
         </div>
         <input type="file" id="story-file-input" accept="image/*,video/*" hidden />
       </div>
 
       <!-- Preview -->
       <div class="upload-preview" id="story-preview" hidden>
-        <img id="story-preview-img" alt="Preview" />
-        <video id="story-preview-vid" autoplay loop muted hidden></video>
-        <button class="btn btn-ghost btn-sm" id="btn-change-story" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <div class="preview-wrapper">
+          <img id="story-preview-img" alt="Preview" />
+          <video id="story-preview-vid" autoplay loop muted hidden></video>
+        </div>
+<button class="btn btn-ghost btn-sm" id="btn-change-story" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           Change
         </button>
       </div>
@@ -64,8 +66,11 @@
 
       <!-- Caption form -->
       <div class="post-meta-form" id="story-form" hidden>
-        <textarea id="story-caption" class="form-input caption-input"
-                  placeholder="Add text to your story…" rows="2" maxlength="200"></textarea>
+        <div class="form-group">
+          <textarea id="story-caption" class="form-input caption-input"
+                    placeholder="Add text to your story…" rows="2" maxlength="200"
+                    aria-label="Story text"></textarea>
+        </div>
       </div>
     </div>
   </main>

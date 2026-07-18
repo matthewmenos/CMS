@@ -9,14 +9,14 @@
 <div id="app-root">
   <header class="app-header">
     <div class="header-inner">
-      <a href="/" class="header-brand">
+      <a href="/" class="header-brand" aria-label="Back">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
-        <span class="header-church-name">Create Post</span>
+        <span class="header-church-name">New Post</span>
       </a>
       <div class="header-actions">
-        <button class="btn btn-primary btn-sm" id="btn-submit-post">Share</button>
+        <button class="btn btn-primary btn-sm" id="btn-submit-post" disabled>Share</button>
       </div>
     </div>
   </header>
@@ -27,25 +27,27 @@
       <div class="drop-zone" id="post-drop-zone">
         <div class="drop-zone-inner">
           <div class="drop-zone-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="60" height="60">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64">
               <rect x="3" y="3" width="18" height="18" rx="3"/>
               <circle cx="8.5" cy="8.5" r="1.5"/>
               <polyline points="21 15 16 10 5 21"/>
             </svg>
           </div>
-          <p class="drop-zone-text">Drag & drop or tap to select</p>
-          <p class="drop-zone-hint">Photos and videos up to 500 MB</p>
-          <button class="btn btn-primary" type="button" id="btn-browse-files">Browse files</button>
+          <p class="drop-zone-text">Add photos and videos</p>
+          <p class="drop-zone-hint">Drag & drop or tap to select • Up to 500 MB</p>
+          <button class="btn btn-primary" type="button" id="btn-browse-files">Select from device</button>
         </div>
         <input type="file" id="post-file-input" accept="image/*,video/*" hidden />
       </div>
 
       <!-- Preview -->
       <div class="upload-preview" id="post-preview" hidden>
-        <img id="post-preview-img" alt="Preview" />
-        <video id="post-preview-vid" controls hidden></video>
+        <div class="preview-wrapper">
+          <img id="post-preview-img" alt="Preview" />
+          <video id="post-preview-vid" controls hidden></video>
+        </div>
         <button class="btn btn-ghost btn-sm" id="btn-change-media" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           Change
         </button>
       </div>
@@ -66,15 +68,22 @@
 
       <!-- Caption & meta form -->
       <div class="post-meta-form" id="post-form" hidden>
-        <textarea id="post-caption" class="form-input caption-input"
-                  placeholder="Write a caption… share what's on your heart" rows="4" maxlength="2200"></textarea>
-        <input type="text" id="post-location" class="form-input"
-               placeholder="📍 Add location" maxlength="100" />
-        <select id="post-type" class="form-input">
-          <option value="image">📷 Photo</option>
-          <option value="video">🎥 Video</option>
-          <option value="reel">🎬 Short Sermon</option>
-        </select>
+        <div class="form-group">
+          <textarea id="post-caption" class="form-input caption-input"
+                    placeholder="Write a caption…" rows="4" maxlength="2200"
+                    aria-label="Caption"></textarea>
+        </div>
+        <div class="form-group">
+          <input type="text" id="post-location" class="form-input"
+                 placeholder="Add location" maxlength="100" aria-label="Location" />
+        </div>
+        <div class="form-group">
+          <select id="post-type" class="form-input" aria-label="Post type">
+            <option value="image">Photo</option>
+            <option value="video">Video</option>
+            <option value="reel">Short Sermon</option>
+          </select>
+        </div>
       </div>
     </div>
   </main>

@@ -223,7 +223,26 @@ CREATE TABLE IF NOT EXISTS prayer_requests (
     is_public  INTEGER DEFAULT 1,
     is_answered INTEGER DEFAULT 0,
     created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
-    answered_at TEXT,
+    answered_at TEXT
+);
+
+-- Groups (for small groups, ministries)
+CREATE TABLE IF NOT EXISTS groups (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT    NOT NULL,
+    description TEXT    DEFAULT '',
+    avatar_key TEXT    DEFAULT '',
+    created_by INTEGER REFERENCES members(id) ON DELETE SET NULL,
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    is_public  INTEGER DEFAULT 1
+);
+
+-- Group members
+CREATE TABLE IF NOT EXISTS group_members (
+    group_id   INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+    member_id  INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    joined_at  TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    PRIMARY KEY (group_id, member_id)
 );
 
 -- Messages/Chat
@@ -235,7 +254,7 @@ CREATE TABLE IF NOT EXISTS messages (
     body       TEXT    DEFAULT '',
     media_key  TEXT    DEFAULT '',
     created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
-    is_read    INTEGER DEFAULT 0,
+    is_read    INTEGER DEFAULT 0
 );
 
 -- Message threads (for grouping)
@@ -248,25 +267,6 @@ CREATE TABLE IF NOT EXISTS message_threads (
     UNIQUE(member1_id, member2_id)
 );
 
--- Groups (for small groups, ministries)
-CREATE TABLE IF NOT EXISTS groups (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    name       TEXT    NOT NULL,
-    description TEXT    DEFAULT '',
-    avatar_key TEXT    DEFAULT '',
-    created_by INTEGER REFERENCES members(id) ON DELETE SET NULL,
-    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
-    is_public  INTEGER DEFAULT 1,
-);
-
--- Group members
-CREATE TABLE IF NOT EXISTS group_members (
-    group_id   INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
-    member_id  INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-    joined_at  TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
-    PRIMARY KEY (group_id, member_id)
-);
-
 -- Child check-in
 CREATE TABLE IF NOT EXISTS children (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -274,7 +274,7 @@ CREATE TABLE IF NOT EXISTS children (
     first_name TEXT    NOT NULL,
     last_name  TEXT    NOT NULL,
     date_of_birth TEXT,
-    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
+    created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
 );
 
 CREATE TABLE IF NOT EXISTS checkins (
@@ -283,7 +283,7 @@ CREATE TABLE IF NOT EXISTS checkins (
     checked_in_by INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
     checkin_time TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
     security_key TEXT    NOT NULL,
-    checkout_time TEXT,
+    checkout_time TEXT
 );
 
 -- Performance indexes

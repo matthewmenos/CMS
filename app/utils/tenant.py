@@ -62,13 +62,14 @@ def open_tenant_db(slug: str) -> None:
     local_path = _local_db_path(slug)
     db_key     = church.db_key
 
-    # Fetch from R2 when the local copy is missing or the TTL expired.
-    if not os.path.exists(local_path) or _needs_r2_refresh(slug):
+    # Fetch from R2 only when the local copy is missing.
+    # Never overwrite a local DB that has data (prevents data loss on new installs)
+    if not os.path.exists(local_path):
         pulled = download_tenant_db(db_key, local_path)  # never raises
-        if not pulled and not os.path.exists(local_path):
+        if not pulled:
             init_tenant_db(local_path)
             log.info("Initialised new tenant DB for '%s'", slug)
-        _sync_timestamps[slug] = time.monotonic()
+    _sync_timestamps[slug] = time.monotonic()
 
     g.tenant_conn   = get_tenant_conn(local_path)
     g.church_slug   = slug

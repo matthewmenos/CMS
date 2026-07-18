@@ -665,6 +665,47 @@ def save_fcm_token():
     return _ok({"saved": True})
 
 
+@api_bp.delete("/device-tokens/<int:token_id>")
+@login_required
+@require_tenant
+def delete_device_token(token_id: int):
+    """Delete a specific device token (e.g., on logout or app uninstall)."""
+    conn   = get_db()
+    member = _current_member(conn)
+    
+    # Only allow deleting own tokens
+    result = conn.execute(
+        "DELETE FROM device_tokens WHERE id = ? AND member_id = ?",
+        (token_id, member["id"]),
+    )
+    
+    conn.commit()
+    mark_dirty()
+    
+    if result.rowcount > 0:
+        return _ok({"deleted": True})
+    return _err("Token not found.", 404)
+
+
+@api_bp.delete("/device-tokens")
+@login_required
+@require_tenant
+def delete_all_device_tokens():
+    """Delete all device tokens for the current user (e.g., on logout)."""
+    conn   = get_db()
+    member = _current_member(conn)
+    
+    conn.execute(
+        "DELETE FROM device_tokens WHERE member_id = ?",
+        (member["id"],),
+    )
+    
+    conn.commit()
+    mark_dirty()
+    
+    return _ok({"deleted": True})
+
+
 # ---------------------------------------------------------------------------
 # SEARCH
 # ---------------------------------------------------------------------------

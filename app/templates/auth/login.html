@@ -123,12 +123,27 @@
     pw.type = pw.type === "password" ? "text" : "password";
   });
 
-  // Loading state on submit
-  document.getElementById("login-form").addEventListener("submit", function() {
+  // Loading state on submit - with error handling
+  document.getElementById("login-form").addEventListener("submit", function(e) {
     const btn = document.getElementById("btn-login");
-    btn.disabled = true;
-    btn.querySelector(".btn-text").hidden = true;
-    btn.querySelector(".btn-spinner").hidden = false;
+    // Only disable if form is valid (has values)
+    const identifier = document.getElementById("identifier").value.trim();
+    const password = document.getElementById("password").value.trim();
+    if (identifier && password) {
+      btn.disabled = true;
+      btn.querySelector(".btn-text").hidden = true;
+      btn.querySelector(".btn-spinner").hidden = false;
+    }
+  });
+
+  // Reset button state if page reloads with error
+  window.addEventListener("pageshow", function() {
+    const btn = document.getElementById("btn-login");
+    if (btn) {
+      btn.disabled = false;
+      btn.querySelector(".btn-text").hidden = false;
+      btn.querySelector(".btn-spinner").hidden = true;
+    }
   });
 </script>
 {% endblock %}

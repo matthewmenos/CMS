@@ -32,6 +32,8 @@ instance/global.db-wal
 instance/tenants/*.db
 instance/tenants/*.db-shm
 instance/tenants/*.db-wal
+instance/data/
+
 
 # ── Logs ──────────────────────────────────────────────────────────────────────
 *.log

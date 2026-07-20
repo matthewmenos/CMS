@@ -42,6 +42,10 @@ _sync_pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="r2-sync")
 atexit.register(lambda: _sync_pool.shutdown(wait=False, cancel_futures=True))
 
 
+# Global DB key in the DB bucket — just a well-known path.
+_GLOBAL_DB_KEY = "global/global.db"
+
+
 def _r2_configured() -> bool:
     """True only when all three required R2 credentials are present."""
     return all(
@@ -77,8 +81,110 @@ def _s3_client():
 
 
 # ---------------------------------------------------------------------------
-# DB SYNC
+# GLOBAL DB SYNC  (persist the global SQLite DB to R2)
 # ---------------------------------------------------------------------------
+
+
+def download_global_db(local_path: str) -> bool:
+    """
+    Download the global .db file from R2 to local_path.
+
+    Returns True on success.
+    Returns False (never raises) when R2 is not configured, the object
+    doesn't exist, or any network/auth error occurs — the caller will
+    fall back to initialising a fresh local database.
+    """
+    if not _r2_configured():
+        log.debug("R2 not configured — skipping global DB download")
+        return False
+
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    try:
+        # Download to a temp file first to check if it's valid
+        temp_path = local_path + ".tmp"
+        _s3_client().download_file(
+            Bucket=os.environ["R2_BUCKET_DB"],
+            Key=_GLOBAL_DB_KEY,
+            Filename=temp_path,
+        )
+
+        # Quick sanity check: is it a valid SQLite file with at least the
+        # churches table?
+        import sqlite3
+        test_conn = sqlite3.connect(temp_path)
+        tables = test_conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='churches'"
+        ).fetchone()
+        test_conn.close()
+
+        if tables:
+            os.replace(temp_path, local_path)
+            log.info("Downloaded global DB from R2 → %s", local_path)
+            return True
+        else:
+            os.remove(temp_path)
+            log.info("Downloaded global DB is not valid — keeping local init")
+            return False
+
+    except ClientError as exc:
+        code = exc.response["Error"]["Code"]
+        if code in ("404", "NoSuchKey", "403", "AccessDenied"):
+            log.info(
+                "Global DB not found in R2 (code=%s) — will initialise locally",
+                code,
+            )
+        else:
+            log.warning("R2 ClientError downloading global DB: %s", exc)
+        return False
+
+    except (BotoCoreError, EndpointResolutionError, OSError, Exception) as exc:
+        log.warning(
+            "R2 download failed for global DB (%s: %s) — falling back to local init",
+            type(exc).__name__, exc,
+        )
+        return False
+
+
+def upload_global_db(local_path: str) -> None:
+    """Sync the local global .db file to R2. Silently skips if R2 not configured."""
+    if not _r2_configured():
+        log.debug("R2 not configured — skipping global DB upload")
+        return
+    try:
+        _s3_client().upload_file(
+            Filename=local_path,
+            Bucket=os.environ["R2_BUCKET_DB"],
+            Key=_GLOBAL_DB_KEY,
+            ExtraArgs={"ContentType": "application/octet-stream"},
+        )
+        log.info("Synced global DB → R2")
+    except Exception as exc:
+        log.warning("R2 upload failed for global DB: %s", exc)
+
+
+def upload_global_db_async(local_path: str) -> None:
+    """
+    Submit a global DB sync to the background thread pool.
+    Safe to call at any point — the pool's atexit handler cancels pending
+    futures cleanly so the interpreter never blocks or errors on shutdown.
+    """
+    def _run():
+        try:
+            upload_global_db(local_path)
+        except Exception as exc:
+            log.warning("Background global DB sync failed: %s", exc)
+
+    try:
+        _sync_pool.submit(_run)
+    except RuntimeError:
+        # Pool already shut down (interpreter exiting) — skip silently.
+        pass
+
+
+# ---------------------------------------------------------------------------
+# TENANT DB SYNC
+# ---------------------------------------------------------------------------
+
 
 def download_tenant_db(db_key: str, local_path: str) -> bool:
     """
